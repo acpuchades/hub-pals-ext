@@ -361,6 +361,13 @@ pals_nutrition <- ufmn_nutrition %>%
     laxative_usage = laxante,
   )
 
+pals_imv_dates <- ufmn_functional |>
+  filter(disnea == 0) |>
+  group_by(pid) |>
+  slice_min(fecha_visita, n = 1, with_ties = FALSE) |>
+  ungroup() |>
+  transmute(patient_id = pid, imv_start_date_approx = fecha_visita)
+
 pals_respiratory <- ufmn_respiratory %>%
   select(
     patient_id = pid,
@@ -423,7 +430,8 @@ pals_respiratory <- ufmn_respiratory %>%
     niv_stopped_reason_compliance = motivo_retirada_vmi_no_cumplimiento,
     niv_stopped_reason_voluntary = motivo_retirada_vmi_rechazo_del_paciente,
     niv_stopped_reason_other = motivo_retirada_vmi_otros
-  )
+  ) |>
+  left_join(pals_imv_dates, by = "patient_id")
 
 pals_genesets <- imegen_paneles %>%
   rename(
@@ -457,7 +465,7 @@ pals_genetics_ext <- imegen_resultados %>%
 
 pals_comorbidities <- ufmn_patients %>%
   mutate(cip_parcial = substr(cip, 1, 13)) %>%
-  inner_join(metrosud_problemas, by = "cip_parcial") %>%
+  inner_join(metrosud_problemas, by = "cip_parcial", multiple = "all") %>%
   select(
     patient_id = pid,
     dx_date = fecha_problema,
@@ -468,7 +476,7 @@ pals_comorbidities <- ufmn_patients %>%
 
 pals_gpvisits <- ufmn_patients %>%
   mutate(cip_parcial = substr(cip, 1, 13)) %>%
-  inner_join(metrosud_visitas, by = "cip_parcial") %>%
+  inner_join(metrosud_visitas, by = "cip_parcial", multiple = "all") %>%
   select(
     patient_id = pid,
     date = fecha_visita,
@@ -479,7 +487,7 @@ pals_gpvisits <- ufmn_patients %>%
 
 pals_treatments <- ufmn_patients %>%
   mutate(cip_parcial = substr(cip, 1, 13)) %>%
-  inner_join(metrosud_farmacia, by = "cip_parcial") %>%
+  inner_join(metrosud_farmacia, by = "cip_parcial", multiple = "all") %>%
   select(
     patient_id = pid,
     prescription_start = fecha_inicio,
@@ -512,7 +520,7 @@ pals_social <- ufmn_patients %>%
 
 pals_gpvars <- ufmn_patients %>%
   mutate(cip_parcial = substr(cip, 1, 13)) %>%
-  inner_join(metrosud_variables, by = "cip_parcial") %>%
+  inner_join(metrosud_variables, by = "cip_parcial", multiple = "all") %>%
   mutate(
     var_name = pals_recode_gpvars_names(cod_variable),
   ) %>%
