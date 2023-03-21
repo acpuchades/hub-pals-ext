@@ -346,7 +346,9 @@ ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
       indicacion_peg, portador_peg, complicacion_peg,
       retirada_peg, espesante, supl_oral, supl_enteral,
       estreñimiento, laxante,
-    ), ufmn_parse_logical, true = "Sí", false = "No"),
+    ), \(x) {
+      ufmn_parse_logical(x, true = "Sí", false = "No")
+    }),
     across(starts_with("motivo_indicacion_"), \(x) {
       ufmn_parse_logical(x, true = "TRUE", false = "FALSE")
     }),
@@ -384,10 +386,12 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") %>%
       retirada_vmni,
       polisomnografia,
       complicacion_vmni,
-    ), \(x) ufmn_parse_logical(x, true = "Sí", false = "No")),
-    pcf_por_debajo_del_umbral = pcf == "<60",
-    pim_por_debajo_del_umbral = pim == "<60",
-    sao2_media_por_debajo_del_umbral = sao2_media == "<90"
+    ), \(x) {
+      ufmn_parse_logical(x, true = "Sí", false = "No")
+    }),
+    pcf_por_debajo_del_umbral = str_starts(pcf, "<"),
+    pim_por_debajo_del_umbral = str_starts(pim, "<"),
+    sao2_media_por_debajo_del_umbral = str_starts(sao2_media, "<")
   ) %>%
   select(!c(id, created_datetime:updated_datetime)) %>%
   arrange(pid, fecha_visita)
@@ -452,7 +456,12 @@ ufmn_followups <- bind_rows(
   select(pid, fecha_visita, origin, cortar, kings_c, mitos)
 
 ufmn_functional %<>%
-  left_join(ufmn_followups, by = c("pid", "fecha_visita"), multiple = "all") %>%
+  left_join(
+    ufmn_followups |>
+      filter(origin == "functional") |>
+      select(pid, fecha_visita, cortar, kings_c, mitos),
+    by = c("pid", "fecha_visita"), multiple = "all"
+  ) %>%
   mutate(
     cortar_con_peg = ifelse(cortar == cortar_con_peg, cortar_con_peg, NA),
     cortar_sin_peg = ifelse(cortar == cortar_sin_peg, cortar_sin_peg, NA)
