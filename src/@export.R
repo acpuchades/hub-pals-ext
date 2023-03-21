@@ -1,8 +1,7 @@
-pals_version <- "v1"
+output_dir <- "output/current"
 
-source("src/precisionals.R")
+source("src/precisionals.r")
 
-output_dir <- str_glue("output/{pals_version}")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 exports <- list(
