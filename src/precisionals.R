@@ -2,12 +2,12 @@ library(dplyr)
 library(readr)
 library(stringr)
 
-source("src/ufmn.R")
-source("src/fmv.R")
-source("src/pram.R")
-source("src/imegen.R")
-source("src/metrosud.R")
-source("src/sectecnica.R")
+source("src/ufmn.r")
+source("src/fmv.r")
+source("src/pram.r")
+source("src/imegen.r")
+source("src/metrosud.r")
+source("src/sectecnica.r")
 
 pals_recode_sex <- function(data) {
   data %>% recode_factor(
