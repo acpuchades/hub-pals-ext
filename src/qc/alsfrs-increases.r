@@ -3,10 +3,8 @@ library(writexl)
 source("src/ufmn.r")
 
 alsfrs_increases <- ufmn_functional |>
-    left_join(
-        ufmn_patients |> select(pid, nhc, cip),
-        by = "pid"
-    ) |>
+    left_join(ufmn_patients, by = "pid") |>
+    select(pid, nhc, cip, fecha_visita, alsfrs_total) |>
     drop_na(pid, fecha_visita, alsfrs_total) |>
     group_by(pid) |>
     arrange(fecha_visita, .by_group = TRUE) |>
@@ -25,6 +23,7 @@ alsfrs_increases <- ufmn_functional |>
     relocate(alsfrs_diff, .after = alsfrs_total_previo)
 
 output_dir <- "output/qc"
-output_path <- file.path(output_dir, "alsfrs-increases.xlsx")
 dir.create(output_dir, showWarnings = FALSE)
+output_path <- file.path(output_dir, "alsfrs-increases.xlsx")
+
 write_xlsx(alsfrs_increases, output_path)
