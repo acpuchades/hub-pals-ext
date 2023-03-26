@@ -391,7 +391,12 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") %>%
     }),
     pcf_por_debajo_del_umbral = str_starts(pcf, "<"),
     pim_por_debajo_del_umbral = str_starts(pim, "<"),
-    sao2_media_por_debajo_del_umbral = str_starts(sao2_media, "<")
+    sao2_media_por_debajo_del_umbral = str_starts(sao2_media, "<"),
+    across(c(
+      pns, pcf, fvc_sentado, fvc_estirado, pim, pem, ph_sangre_arterial,
+      pao2, paco2, hco3, sao2_media, ct90, odi3, ct90_polisomnografia, iah,
+      fvc_sentado_absoluto, fvc_estirado_absoluto
+    ), parse_number)
   ) %>%
   select(!c(id, created_datetime:updated_datetime)) %>%
   arrange(pid, fecha_visita)
