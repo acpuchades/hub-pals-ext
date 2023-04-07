@@ -1,5 +1,3 @@
-library(writexl)
-
 source("src/ufmn.r")
 
 alsfrs_increases <- ufmn_functional |>
@@ -21,9 +19,3 @@ alsfrs_increases <- ufmn_functional |>
     relocate(alsfrs_total, .after = fecha_visita_previa) |>
     relocate(alsfrs_total_previo, .after = alsfrs_total) |>
     relocate(alsfrs_diff, .after = alsfrs_total_previo)
-
-output_dir <- "output/qc"
-dir.create(output_dir, showWarnings = FALSE)
-output_path <- file.path(output_dir, "alsfrs-increases.xlsx")
-
-write_xlsx(alsfrs_increases, output_path)

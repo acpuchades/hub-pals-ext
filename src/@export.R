@@ -1,8 +1,9 @@
-output_dir <- "output/current"
+library(xfun)
 
 source("src/precisionals.r")
-
-dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+source("src/qc/alsfrs-increases.r")
+source("src/qc/followup-dates.r")
+source("src/qc/numeric-outliers.r")
 
 exports <- list(
     "alsfrs_r" = pals_alsfrs,
@@ -22,9 +23,30 @@ exports <- list(
     "treatments" = pals_treatments
 )
 
+qc_exports <- list(
+    "alsfrs-increases" = alsfrs_increases,
+    "followups-before-onset" = followups_before_onset,
+    "followups-after-death" = followups_after_death,
+    "respiratory-outliers" = respiratory_outliers,
+    "nutrition-outliers" = nutrition_outliers
+)
+
+output_dir <- "output/current"
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
 for (key in names(exports)) {
     data <- exports[[key]]
     output_name <- str_glue("pals-{key}.csv")
     path <- file.path(output_dir, output_name)
+    write_csv(data, path)
+}
+
+qc_output_dir <- file.path(output_dir, "qc")
+dir.create(qc_output_dir, recursive = TRUE, showWarnings = FALSE)
+
+for (key in names(qc_exports)) {
+    data <- qc_exports[[key]]
+    output_name <- key |> with_ext(".csv")
+    path <- file.path(qc_output_dir, output_name)
     write_csv(data, path)
 }
