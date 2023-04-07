@@ -23,10 +23,7 @@ alsfrs_increases <- ufmn_functional |>
 
 ignore_path <- "src/qc/alsfrs-increases.ignore"
 if (file.exists(ignore_path)) {
-    ignored <- read_csv(ignore_path, col_types = cols(
-        id_paciente = col_character(),
-        fecha_visita = col_date("%d/%m/%Y")
-    ))
+    ignored <- read_csv(ignore_path)
     alsfrs_increases <- alsfrs_increases |>
-        anti_join(ignored, by = c("id_paciente", "fecha_visita"))
+        anti_join(ignored, by = "id_visita")
 }

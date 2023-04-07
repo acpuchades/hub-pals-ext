@@ -26,16 +26,9 @@ nutrition_outliers <- ufmn_nutrition |>
 
 nutrition_outliers_ignore_path <- "src/qc/nutrition-outliers.ignore"
 if (file.exists(nutrition_outliers_ignore_path)) {
-    ignored <- read_csv(
-        nutrition_outliers_ignore_path,
-        col_types = cols(
-            id_paciente = col_character(),
-            fecha_visita = col_date("%d/%m/%Y"),
-            param_name = col_character()
-        )
-    )
+    ignored <- read_csv(nutrition_outliers_ignore_path)
     nutrition_outliers <- nutrition_outliers |>
-        anti_join(ignored, by = c("id_paciente", "fecha_visita", "param_name"))
+        anti_join(ignored, by = c("id_visita", "param_name"))
 }
 
 respiratory_outliers <- ufmn_respiratory |>
@@ -45,14 +38,7 @@ respiratory_outliers <- ufmn_respiratory |>
 
 respiratory_outliers_ignore_path <- "src/qc/respiratory-outliers.ignore"
 if (file.exists(respiratory_outliers_ignore_path)) {
-    ignored <- read_csv(
-        respiratory_outliers_ignore_path,
-        col_types = cols(
-            id_paciente = col_character(),
-            fecha_visita = col_date("%d/%m/%Y"),
-            param_name = col_character()
-        )
-    )
+    ignored <- read_csv(respiratory_outliers_ignore_path)
     respiratory_outliers <- respiratory_outliers |>
-        anti_join(ignored, by = c("id_paciente", "fecha_visita", "param_name"))
+        anti_join(ignored, by = c("id_visita", "param_name"))
 }
