@@ -176,15 +176,15 @@ pals_recode_disability_level <- function(data) {
 }
 
 pals_last_followups <- ufmn_patients |>
-  left_join(ufmn_followups, by = "pid", multiple = "all") |>
-  group_by(pid) |>
+  left_join(ufmn_followups, by = "id_paciente", multiple = "all") |>
+  group_by(id_paciente) |>
   slice_max(fecha_visita, n = 1, with_ties = FALSE) |>
   ungroup() |>
   rename(last_followup = "fecha_visita") |>
-  select(patient_id = pid, last_followup)
+  select(patient_id = id_paciente, last_followup)
 
 pals_patients <- ufmn_patients %>%
-  inner_join(ufmn_clinical, by = "pid") %>%
+  inner_join(ufmn_clinical, by = "id_paciente") %>%
   select(!c(
     provincia_nacimiento,
     provincia_residencia,
@@ -207,7 +207,7 @@ pals_patients <- ufmn_patients %>%
     resultado_estudio_cognitivo_otros
   )) %>%
   rename(
-    patient_id = pid,
+    patient_id = id_paciente,
     hospital_id = nhc,
     birthdate = fecha_nacimiento,
     zip_code = codigo_postal,
@@ -248,7 +248,8 @@ pals_patients <- ufmn_patients %>%
 
 pals_alsfrs <- ufmn_functional %>%
   rename(
-    patient_id = pid,
+    patient_id = id_paciente,
+    assessment_id = id_visita,
     assessment_date = fecha_visita,
     speech = lenguaje,
     salivation = salivacion,
@@ -296,7 +297,7 @@ pals_er_diagnoses <- sectecnica_urg_diagnosticos %>%
 
 pals_genetics <- ufmn_clinical %>%
   select(
-    patient_id = pid,
+    patient_id = id_paciente,
     c9_status = estudio_gen_c9,
     sod1_status = estudio_gen_sod1,
     atxn2_status = estudio_gen_atxn2,
@@ -330,7 +331,8 @@ pals_nutrition <- ufmn_nutrition %>%
     peg_usage = pals_recode_peg_usage(uso_peg)
   ) %>%
   select(
-    patient_id = pid,
+    patient_id = id_paciente,
+    assessment_id = id_visita,
     assessment_date = fecha_visita,
     weight = peso,
     weigh_date = fecha_peso,
@@ -365,14 +367,15 @@ pals_nutrition <- ufmn_nutrition %>%
 
 pals_imv_dates <- ufmn_functional |>
   filter(disnea == 0) |>
-  group_by(pid) |>
+  group_by(id_paciente) |>
   slice_min(fecha_visita, n = 1, with_ties = FALSE) |>
   ungroup() |>
-  transmute(patient_id = pid, imv_start_date_approx = fecha_visita)
+  transmute(patient_id = id_paciente, imv_start_date_approx = fecha_visita)
 
 pals_respiratory <- ufmn_respiratory %>%
   select(
-    patient_id = pid,
+    patient_id = id_paciente,
+    assessment_id = id_visita,
     assessment_date = fecha_visita,
     copd_history = tipo_patologia_respiratoria_epoc,
     asthma_history = tipo_patologia_respiratoria_asma,
@@ -470,7 +473,7 @@ pals_comorbidities <- ufmn_patients %>%
   mutate(cip_parcial = substr(cip, 1, 13)) %>%
   inner_join(metrosud_problemas, by = "cip_parcial", multiple = "all") %>%
   select(
-    patient_id = pid,
+    patient_id = id_paciente,
     dx_date = fecha_problema,
     dx_code = cod_problema,
     dx_encoding = codif_problema,
@@ -481,7 +484,7 @@ pals_gpvisits <- ufmn_patients %>%
   mutate(cip_parcial = substr(cip, 1, 13)) %>%
   inner_join(metrosud_visitas, by = "cip_parcial", multiple = "all") %>%
   select(
-    patient_id = pid,
+    patient_id = id_paciente,
     date = fecha_visita,
     dx_code = cod_problema,
     dx_encoding = codif_problema,
@@ -492,7 +495,7 @@ pals_treatments <- ufmn_patients %>%
   mutate(cip_parcial = substr(cip, 1, 13)) %>%
   inner_join(metrosud_farmacia, by = "cip_parcial", multiple = "all") %>%
   select(
-    patient_id = pid,
+    patient_id = id_paciente,
     prescription_start = fecha_inicio,
     prescription_end = fecha_fin,
     product_code = cod_producto,
@@ -509,7 +512,7 @@ pals_social <- ufmn_patients %>%
     tipo_incapacidad = pals_recode_disability_level(tipo_incapacidad),
   ) %>%
   select(
-    patient_id = pid,
+    patient_id = id_paciente,
     income_source = situacion_laboral,
     has_family_caregiver = cuidador_familiar,
     has_profesional_caregiver = cuidador_profesional,
@@ -528,7 +531,7 @@ pals_gpvars <- ufmn_patients %>%
     var_name = pals_recode_gpvars_names(cod_variable),
   ) %>%
   select(
-    patient_id = pid,
+    patient_id = id_paciente,
     date = fecha_registro,
     var_name, value = valor
   ) %>%

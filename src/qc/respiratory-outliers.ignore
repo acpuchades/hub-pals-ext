@@ -1,4 +1,4 @@
-pid,fecha_visita,param_name
+id_paciente,fecha_visita,param_name
 eb5ac335-59a1-4063-9e53-ca26a5d2a286,9/8/2013,ct90
 f6676661-676b-486e-bdff-0fe932219b8e,18/12/2018,ct90
 965c5727-8b2d-48d3-9b35-cce8a2293f57,22/12/2017,pns

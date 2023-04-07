@@ -1,12 +1,13 @@
 source("src/ufmn.r")
 
 alsfrs_increases <- ufmn_functional |>
-    left_join(ufmn_patients, by = "pid") |>
-    select(pid, nhc, cip, fecha_visita, alsfrs_total) |>
-    drop_na(pid, fecha_visita, alsfrs_total) |>
-    group_by(pid) |>
+    left_join(ufmn_patients, by = "id_paciente") |>
+    select(id_paciente, nhc, cip, id_visita, fecha_visita, alsfrs_total) |>
+    drop_na(id_paciente, fecha_visita, alsfrs_total) |>
+    group_by(id_paciente) |>
     arrange(fecha_visita, .by_group = TRUE) |>
     mutate(
+        id_visita_previa = lag(id_visita),
         fecha_visita_previa = lag(fecha_visita),
         alsfrs_total_previo = lag(alsfrs_total),
         alsfrs_diff = alsfrs_total - lag(alsfrs_total)
@@ -14,7 +15,7 @@ alsfrs_increases <- ufmn_functional |>
     ungroup() |>
     filter(alsfrs_diff > 0) |>
     arrange(desc(alsfrs_diff)) |>
-    relocate(nhc:cip, .after = pid) |>
+    relocate(nhc:cip, .after = id_paciente) |>
     relocate(fecha_visita_previa, .after = fecha_visita) |>
     relocate(alsfrs_total, .after = fecha_visita_previa) |>
     relocate(alsfrs_total_previo, .after = alsfrs_total) |>
@@ -23,9 +24,9 @@ alsfrs_increases <- ufmn_functional |>
 ignore_path <- "src/qc/alsfrs-increases.ignore"
 if (file.exists(ignore_path)) {
     ignored <- read_csv(ignore_path, col_types = cols(
-        pid = col_character(),
+        id_paciente = col_character(),
         fecha_visita = col_date("%d/%m/%Y")
     ))
     alsfrs_increases <- alsfrs_increases |>
-        anti_join(ignored, by = c("pid", "fecha_visita"))
+        anti_join(ignored, by = c("id_paciente", "fecha_visita"))
 }
