@@ -184,7 +184,7 @@ pals_last_followups <- ufmn_patients |>
   select(patient_id = pid, last_followup)
 
 pals_patients <- ufmn_patients %>%
-  left_join(ufmn_clinical, by = "pid") %>%
+  inner_join(ufmn_clinical, by = "pid") %>%
   select(!c(
     provincia_nacimiento,
     provincia_residencia,
@@ -267,7 +267,8 @@ pals_alsfrs <- ufmn_functional %>%
     alsfrs_fine_motor = alsfrs_motor_fino,
     alsfrs_gross_motor = alsfrs_motor_grosero,
     alsfrs_respiratory = alsfrs_respiratorio
-  )
+  ) %>%
+  semi_join(pals_patients, by = "patient_id")
 
 pals_er_episodes <- sectecnica_urg_episodios %>%
   rename(
@@ -359,7 +360,8 @@ pals_nutrition <- ufmn_nutrition %>%
     enteral_suppl_start = fecha_inicio_supl_enteral,
     constipation = estreñimiento,
     laxative_usage = laxante,
-  )
+  ) %>%
+  semi_join(pals_patients, by = "patient_id")
 
 pals_imv_dates <- ufmn_functional |>
   filter(disnea == 0) |>
@@ -431,6 +433,7 @@ pals_respiratory <- ufmn_respiratory %>%
     niv_stopped_reason_voluntary = motivo_retirada_vmi_rechazo_del_paciente,
     niv_stopped_reason_other = motivo_retirada_vmi_otros
   ) |>
+  semi_join(pals_patients, by = "patient_id") %>%
   left_join(pals_imv_dates, by = "patient_id")
 
 pals_genesets <- imegen_paneles %>%
