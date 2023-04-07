@@ -19,3 +19,13 @@ alsfrs_increases <- ufmn_functional |>
     relocate(alsfrs_total, .after = fecha_visita_previa) |>
     relocate(alsfrs_total_previo, .after = alsfrs_total) |>
     relocate(alsfrs_diff, .after = alsfrs_total_previo)
+
+ignore_path <- "src/qc/alsfrs-increases.ignore"
+if (file.exists(ignore_path)) {
+    ignored <- read_csv(ignore_path, col_types = cols(
+        pid = col_character(),
+        fecha_visita = col_date("%d/%m/%Y")
+    ))
+    alsfrs_increases <- alsfrs_increases |>
+        anti_join(ignored, by = c("pid", "fecha_visita"))
+}
