@@ -42,11 +42,14 @@ for (key in names(exports)) {
 }
 
 qc_output_dir <- file.path(output_dir, "qc")
+unlink(qc_output_dir, recursive = TRUE)
 dir.create(qc_output_dir, recursive = TRUE, showWarnings = FALSE)
 
 for (key in names(qc_exports)) {
     data <- qc_exports[[key]]
     output_name <- key |> with_ext(".csv")
     path <- file.path(qc_output_dir, output_name)
-    write_csv(data, path)
+    if (nrow(data) > 0) {
+        write_csv(data, path)
+    }
 }
