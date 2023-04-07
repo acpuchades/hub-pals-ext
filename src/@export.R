@@ -6,7 +6,7 @@ source("src/qc/followup-dates.r")
 source("src/qc/numeric-outliers.r")
 
 exports <- list(
-    "alsfrs_r" = pals_alsfrs,
+    "alsfrs" = pals_alsfrs,
     "comorbidities" = pals_comorbidities,
     "er_diagnoses" = pals_er_diagnoses,
     "er_episodes" = pals_er_episodes,
