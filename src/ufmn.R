@@ -6,6 +6,8 @@ library(stringi)
 library(readr)
 library(tidyr)
 
+source("src/utils.r")
+
 ufmn_data_path <- "data/ufmn-2023_01_18.sqlite"
 
 ufmn_parse_na <- function(data, na_empty = FALSE) {
@@ -339,7 +341,7 @@ ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
   rows_update(tibble(id_visita = "f9054526-1dcc-11eb-bb4a-9745fc970131", fecha_indicacion_peg = "23-10-2020"), by = "id_visita") %>% # was 23-10-20020
   rows_update(tibble(id_visita = "8c5b0f46-df7a-11e9-9c30-274ab37b3217", fecha_indicacion_peg = "20-07-3018"), by = "id_visita") %>% # was 20-07-3018
   rows_update(tibble(id_visita = "eb700688-3dfe-11eb-9383-d3a3b2195eff", fecha_complicacion_peg = "22-11-2020"), by = "id_visita") %>% # was 22-11-202
-  mutate(across(starts_with("fecha"), \(x) ifelse(x == "29-02-2015", "28-02-2015", x))) %>%
+  mutate(across(starts_with("fecha_"), \(x) ifelse(x == "29-02-2015", "28-02-2015", x))) %>%
   mutate(across(everything(), ufmn_parse_na),
     across(starts_with("fecha"), ufmn_parse_date),
     across(c(
@@ -545,9 +547,132 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     insuf_resp = insuficiencia_respiratoria,
     kings_r = kings
   ) %>%
-  mutate(across(everything(), ufmn_parse_na)) %>%
-  filter(!if_all(lenguaje:insuf_resp, is.na)) %>%
-  mutate(across(lenguaje:insuf_resp, parse_integer),
+  rows_reset(tibble(id_visita = "c762bfca-df50-11e7-913f-898db1444b28"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "7824e0ae-0b1b-11e8-ada5-c11bb16fd5d7"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "d950b7be-be53-11e7-854b-69bf7a307972"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "52a010f0-0b53-11e8-a739-3927728b190b"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "c490d08e-22e4-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "b98eb8de-0b12-11e8-ada5-c11bb16fd5d7"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "31775b3a-df53-11e7-913f-898db1444b28"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "3290366e-0b17-11e8-ada5-c11bb16fd5d7"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "482ed0f2-22e6-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "1e1b0230-bfaf-11e7-8973-f909c4af69c9"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "7b222648-e4d0-11e7-8222-4fcf3b7eb7b9"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "d48b24a2-e0cd-11e7-a41d-951fbf0a64ef"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "6216659c-4431-11eb-8819-1948421e8c8d"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "081ccd70-3c08-11e9-bacb-89acb4d69104"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "1142f7a0-8f63-11e8-90a3-ff2b0bfabaa2"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "277837de-208a-11e9-9341-45e3ce47fe90"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "664c7d1e-ee90-11ea-aa63-851e06783497"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "9e46525a-b305-11eb-96a7-27cdb1c6efb1"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "f877112a-59b2-11ec-97be-b1dc88f020df"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "7d33fa84-edbe-11ea-b1c3-e5404a292065"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "0418da4a-df50-11e7-913f-898db1444b28"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "40573a56-22e4-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "a0a3bff2-e2cb-11ea-b03f-a7e8f227e03a"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "66532790-be5f-11e7-854b-69bf7a307972"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "6ce47da4-d99c-11e7-b681-6585f92f3d5c"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "5f4bc604-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "8025974c-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "89d6f9ac-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "c3c10f66-bfca-11e7-af09-51e9d3377771"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "f5997e1c-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "8356b516-3df3-11eb-9383-d3a3b2195eff"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "c0792408-2b4d-11e8-a24c-e9b93d7ec40a"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "2b5c8a1c-1d70-11e8-824e-4f42ed25e7a5"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "31acd35a-22e2-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "da5aa432-22e2-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "5e969c7e-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
+  rows_reset(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "3318ad62-e4db-11e7-8222-4fcf3b7eb7b9",
+    # ALSFRS 4-4-4-2-1-2-3-3-3-4-4-4
+    lenguaje = "4", salivacion = "4", deglucion = "4",
+    escritura = "2", cortar_con_peg = "1", cortar_sin_peg = "1", vestido = "2",
+    cama = "3", caminar = "3", subir_escaleras = "3",
+    disnea = "4", ortopnea = "4", insuf_resp = "4"
+  ), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "930344b6-9a30-11e8-9eb2-af099be7b978",
+    # ALSFRS 3-3-3-come sola-corta con ayuda-se vista y asea sola lenta-anda con ayuda-
+    # sube escaleras con ayuda-disnea reposo-no ortopnea-no ventilada
+    lenguaje = "3", salivacion = "3", deglucion = "3",
+    escritura = NA, cortar_con_peg = NA, cortar_sin_peg = "4", vestido = "3",
+    cama = NA, caminar = "2", subir_escaleras = "1",
+    disnea = "1", ortopnea = "4", insuf_resp = "4"
+  ), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "14a1b498-ce8c-11eb-afd7-ed6fcecd9429",
+    # ALSFRS 4-4-4-4-4-4-4-2-1-4-4-4
+    lenguaje = "4", salivacion = "4", deglucion = "4",
+    escritura = "4", cortar_con_peg = "4", cortar_sin_peg = "4", vestido = "4",
+    cama = "4", caminar = "2", subir_escaleras = "1",
+    disnea = "4", ortopnea = "4", insuf_resp = "4"
+  ), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "bdbd9d42-98c1-11e9-9feb-8dcf40d9fa45",
+    # ALSFRS 0-3-1-2-1-2-3-2-1-4-4-4
+    lenguaje = "0", salivacion = "3", deglucion = "1",
+    escritura = "2", cortar_con_peg = "1", cortar_sin_peg = "1", vestido = "2",
+    cama = "3", caminar = "2", subir_escaleras = "1",
+    disnea = "4", ortopnea = "4", insuf_resp = "4"
+  ), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "c39cd9ec-12a3-11ea-badc-8b5db01dc70c",
+    # ALSFRS 0-3-1-2-1-2-3-2-1-2-0-0
+    lenguaje = "0", salivacion = "3", deglucion = "1",
+    escritura = "2", cortar_con_peg = "1", cortar_sin_peg = "1", vestido = "2",
+    cama = "3", caminar = "2", subir_escaleras = "1",
+    disnea = "2", ortopnea = "0", insuf_resp = "0"
+  ), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "796374aa-ee9c-11ea-aa63-851e06783497",
+    # ALSFRS 4-4-4-2-0-0-0-0-0-3-4-2
+    lenguaje = "4", salivacion = "4", deglucion = "4",
+    escritura = "2", cortar_con_peg = "0", cortar_sin_peg = "0", vestido = "0",
+    cama = "0", caminar = "0", subir_escaleras = "0",
+    disnea = "3", ortopnea = "4", insuf_resp = "2"
+  ), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "1a485a74-df68-11e9-9c30-274ab37b3217",
+    # ALSFRS: habla 3, salivacion 3, deglucion 3, comer 0, escribir 0, higiene 0,
+    # girarse cama 0, deambular 0, escaleras 0, no disnea ni ortopnea pero VMNI nocturna
+    lenguaje = "3", salivacion = "3", deglucion = "3",
+    escritura = "0", cortar_con_peg = "0", cortar_sin_peg = "0", vestido = "0",
+    cama = "0", caminar = "0", subir_escaleras = "0",
+    disnea = "0", ortopnea = "0", insuf_resp = "2"
+  ), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "0aded8ac-4eaa-11ec-886f-6f0859135454",
+    # ALSFRS 3-3-3-0-0-0-1-0-0-2-0-4
+    lenguaje = "3", salivacion = "3", deglucion = "3",
+    escritura = "0", cortar_con_peg = "0", cortar_sin_peg = "0", vestido = "0",
+    cama = "1", caminar = "0", subir_escaleras = "0",
+    disnea = "2", ortopnea = "0", insuf_resp = "4"
+  ), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "cfd1d762-52c9-11e8-880e-7fe41889cc89",
+    # ALSFRS 4-4-3-3-3-2-3-2-1-0-0-1
+    lenguaje = "4", salivacion = "4", deglucion = "3",
+    escritura = "3", cortar_con_peg = "3", cortar_sin_peg = "3", vestido = "2",
+    cama = "3", caminar = "2", subir_escaleras = "1",
+    disnea = "0", ortopnea = "0", insuf_resp = "1"
+  ), by = "id_visita") %>%
+  rows_update(tibble(
+    id_visita = "1a485a74-df68-11e9-9c30-274ab37b3217",
+    # ALSFRS habla 3, salivacion 3, deglucion 3, comer 0, escribir 0, higiene 0,
+    # girarse cama 0, deambular 0, escaleras 0, no disnea ni ortopnea pero VNIV nocturna (0-0-2)
+    lenguaje = "3", salivacion = "3", deglucion = "3",
+    escritura = "0", cortar_con_peg = "0", cortar_sin_peg = "0", vestido = "0",
+    cama = "0", caminar = "0", subir_escaleras = "0",
+    disnea = "0", ortopnea = "0", insuf_resp = "2"
+  ), by = "id_visita") %>%
+  mutate(
+    across(everything(), ufmn_parse_na),
+    across(lenguaje:insuf_resp, parse_integer),
     fecha_visita = ufmn_parse_date(fecha_visita)
   ) %>%
   select(!c(total:total_bulbar, mitos, created_datetime:updated_datetime)) %>%
@@ -617,6 +742,7 @@ ufmn_functional %<>%
     alsfrs_respiratorio = sum(c_across(disnea:insuf_resp)),
     alsfrs_total = sum(c_across(lenguaje:insuf_resp), na.rm = TRUE)
   ) %>%
+  filter(!if_all(lenguaje:insuf_resp, is.na)) %>%
   relocate(cortar, .before = cortar_sin_peg) %>%
   relocate(kings_r:mitos, .after = alsfrs_total)
 

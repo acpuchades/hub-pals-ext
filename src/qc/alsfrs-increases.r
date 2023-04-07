@@ -16,10 +16,7 @@ alsfrs_increases <- ufmn_functional |>
     filter(alsfrs_diff > 0) |>
     arrange(desc(alsfrs_diff)) |>
     relocate(nhc:cip, .after = id_paciente) |>
-    relocate(fecha_visita_previa, .after = fecha_visita) |>
-    relocate(alsfrs_total, .after = fecha_visita_previa) |>
-    relocate(alsfrs_total_previo, .after = alsfrs_total) |>
-    relocate(alsfrs_diff, .after = alsfrs_total_previo)
+    relocate(alsfrs_total, .before = alsfrs_total_previo)
 
 ignore_path <- "src/qc/alsfrs-increases.ignore"
 if (file.exists(ignore_path)) {
