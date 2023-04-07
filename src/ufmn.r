@@ -336,6 +336,8 @@ ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
     supl_oral = suplementacion_nutricional_oral,
     supl_enteral = suplementacion_nutricional_entera,
   ) %>%
+  rows_delete(tibble(id_visita = "8f1916dc-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
+  rows_delete(tibble(id_visita = "95ba295e-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
   rows_update(tibble(id_visita = "40c68842-eeb1-4cd2-a0d8-c5cbc839730c", fecha_visita = NA), by = "id_visita") %>% # was '99-99-9999'
   rows_update(tibble(id_visita = "67e615f4-5f01-11eb-a21b-8316bff80df0", fecha_visita = "03-12-2019"), by = "id_visita") %>% # was 03-12-20219
   rows_update(tibble(id_visita = "f9054526-1dcc-11eb-bb4a-9745fc970131", fecha_indicacion_peg = "23-10-2020"), by = "id_visita") %>% # was 23-10-20020
@@ -375,6 +377,8 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") %>%
     sas_apneas_no_claramente_obstructivas = sas_apneas_no_claramanete_obstructivas,
     indicacion_vmni = vmni_indicacion,
   ) %>%
+  rows_delete(tibble(id_visita = "a5c3cdf0-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
+  rows_delete(tibble(id_visita = "a9960e16-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
   rows_update(tibble(id_visita = "c2049bdf-4a91-43e0-b6c4-f770881b7499", fecha_visita = NA), by = "id_visita") %>% # was 99-99-9999
   rows_update(tibble(id_visita = "a3608f72-82eb-11e9-aed7-57f320d0dba4", fecha_realizacion_polisomnografia = NA), by = "id_visita") %>% # was 14
   rows_update(tibble(id_visita = "f508e4b8-db93-11e9-b372-090a91bd3693", fecha_realizacion_polisomnografia = NA), by = "id_visita") %>% # was 14
