@@ -513,6 +513,14 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") %>%
   ), by = "id_visita") %>%
   rows_update(tibble(id_visita = "91019da8-4a56-11e9-9f98-cd726d473012", ph_sangre_arterial = "7.45"), by = "id_visita") %>% # was 45
   rows_update(tibble(id_visita = "0c57cd06-d936-11e9-87ad-ad3b45e595ef", pns = "28", pcf = "300"), by = "id_visita") %>% # values were flipped
+  rows_update(tibble(id_visita = "2d03851a-1d78-4ff2-950c-4f1372f5aef0", pcf = NA), by = "id_visita") %>% # was 310-330-360 (PFR)
+  rows_update(tibble(id_visita = "c4d4d078-5dc1-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 200-180-230 (PFR)
+  rows_update(tibble(id_visita = "fc8ed9a8-5dc8-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 240-180-200 (PFR)
+  rows_update(tibble(id_visita = "10e3c698-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 180-180-190 (PFR)
+  rows_update(tibble(id_visita = "45551198-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 160-120-140 (PFR)
+  rows_update(tibble(id_visita = "578c75b8-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 130-180-120 (PFR)
+  rows_update(tibble(id_visita = "6e11d738-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 200-180-150 (PFR)
+  rows_update(tibble(id_visita = "82d11eb8-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 120-140-120 (PFR)
   mutate(
     across(!c(ends_with("_cual"), cumplimiento_cpap), \(x) ufmn_parse_na(x, na_empty = TRUE)),
     across(starts_with("fecha"), ufmn_parse_date),
