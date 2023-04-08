@@ -340,6 +340,7 @@ ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
   ) %>%
   rows_delete(tibble(id_visita = "8f1916dc-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
   rows_delete(tibble(id_visita = "95ba295e-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
+  rows_update(tibble(id_paciente = "29e0933e-11e9-11eb-86f8-ad4d5277349f", peso_premorbido = "124"), by = "id_paciente") %>% # was 126
   rows_update(tibble(id_visita = "40c68842-eeb1-4cd2-a0d8-c5cbc839730c", fecha_visita = NA), by = "id_visita") %>% # was '99-99-9999'
   rows_update(tibble(id_visita = "67e615f4-5f01-11eb-a21b-8316bff80df0", fecha_visita = "03-12-2019"), by = "id_visita") %>% # was 03-12-20219
   rows_update(tibble(id_visita = "f9054526-1dcc-11eb-bb4a-9745fc970131", fecha_indicacion_peg = "23-10-2020"), by = "id_visita") %>% # was 23-10-20020
