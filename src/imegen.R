@@ -31,5 +31,6 @@ imegen_resultados <-
         interpretacion = `Interpretación`
     ) %>%
     mutate(
+        across(nhc, as.character),
         across(c(panel, genotipo, interpretacion, herencia), factor),
     )

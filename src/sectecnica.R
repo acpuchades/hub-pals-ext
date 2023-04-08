@@ -64,7 +64,11 @@ sectecnica_hosp <-
   ) %>%
   relocate(codif_diagnostico, .before = cod_diagnostico) %>%
   rows_delete(tibble(nhc = "Total general"), by = "nhc") %>%
-  mutate(across(nhc, parse_integer)) %>%
+  mutate(across(nhc, \(x) {
+    x |>
+      parse_integer() |>
+      as.character()
+  })) %>%
   arrange(nhc, fecha_ingreso)
 
 sectecnica_urg <- read_excel(
@@ -103,7 +107,11 @@ sectecnica_urg <- read_excel(
   ) %>%
   relocate(codif_diagnostico, .before = cod_diagnostico) %>%
   rows_delete(tibble(nhc = "Total general"), by = "nhc") %>%
-  mutate(across(nhc, parse_integer)) %>%
+  mutate(across(nhc, \(x) {
+    x |>
+      parse_integer() |>
+      as.character()
+  })) %>%
   arrange(nhc, fecha_entrada)
 
 sectecnica_urg_episodios <- sectecnica_urg %>%

@@ -247,7 +247,9 @@ ufmn_patients <- DBI::dbReadTable(ufmn_db, "pacientes") %>%
   rows_delete(tibble(id_paciente = "9342fe7c-d949-11e9-842a-ebf9c1d8fdac"), by = "id_paciente") %>% # no data
   mutate(
     across(everything(), ufmn_parse_na),
-    across(nhc, parse_integer),
+    across(nhc, \(x) x |>
+      parse_integer() |>
+      as.character()),
     fecha_nacimiento = ufmn_parse_date(fecha_nacimiento),
     sexo = ufmn_parse_factor(sexo),
     exitus = ufmn_parse_logical(exitus, true = "Sí", false = "No"),
@@ -343,6 +345,10 @@ ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
   rows_update(tibble(id_visita = "f9054526-1dcc-11eb-bb4a-9745fc970131", fecha_indicacion_peg = "23-10-2020"), by = "id_visita") %>% # was 23-10-20020
   rows_update(tibble(id_visita = "8c5b0f46-df7a-11e9-9c30-274ab37b3217", fecha_indicacion_peg = "20-07-3018"), by = "id_visita") %>% # was 20-07-3018
   rows_update(tibble(id_visita = "eb700688-3dfe-11eb-9383-d3a3b2195eff", fecha_complicacion_peg = "22-11-2020"), by = "id_visita") %>% # was 22-11-202
+  rows_update(tibble(id_visita = "d2327cb2-08e8-11ed-a5ea-eb25c156d89d", estatura = "150"), by = "id_visita") %>%
+  rows_update(tibble(id_visita = "2d8c9ed8-899d-11ec-ba66-03eb67e47b69", estatura = "166"), by = "id_visita") %>%
+  rows_update(tibble(id_visita = "d2327cb2-08e8-11ed-a5ea-eb25c156d89d", imc = NA), by = "id_visita") %>%
+  rows_update(tibble(id_visita = "2d8c9ed8-899d-11ec-ba66-03eb67e47b69", imc = NA), by = "id_visita") %>%
   mutate(across(starts_with("fecha_"), \(x) ifelse(x == "29-02-2015", "28-02-2015", x))) %>%
   mutate(across(everything(), ufmn_parse_na),
     across(starts_with("fecha"), ufmn_parse_date),
