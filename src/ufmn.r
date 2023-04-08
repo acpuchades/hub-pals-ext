@@ -521,6 +521,64 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") %>%
   rows_update(tibble(id_visita = "578c75b8-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 130-180-120 (PFR)
   rows_update(tibble(id_visita = "6e11d738-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 200-180-150 (PFR)
   rows_update(tibble(id_visita = "82d11eb8-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 120-140-120 (PFR)
+  rows_update(tibble(id_visita = "5de4577e-0b11-11e8-ada5-c11bb16fd5d7", ph_sangre_arterial = "7.4"), by = "id_visita") %>% # was 7,40
+  rows_update(tibble(id_visita = "24ed97f8-3b4b-11e9-b6ec-151f525efe3b", pao2 = "90"), by = "id_visita") %>% # was 990
+  rows_update(tibble(id_visita = "4e552b10-4cb6-457d-b7d6-b62b0e42686a", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
+  rows_update(tibble(id_visita = "7c2daa33-0525-4778-8e26-75456d7ab259", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
+  rows_update(tibble(id_visita = "ddc0bd29-3363-4689-92e3-b4cf22f2230d", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
+  rows_update(tibble(id_visita = "7dd66ffe-dc36-48d3-9285-678c2de02291", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
+  rows_update(tibble(id_visita = "48dd2afc-302a-4b38-bd37-234022474a26", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
+  rows_update(tibble(id_visita = "1281f464-6471-11eb-91da-53f2dbb71c3f", sao2_media = "93.5", ct90 = "13"), by = "id_visita") %>% # wrong values
+  rows_update(tibble(id_visita = "4308f4ec-d272-11eb-b08c-851f5b5d129e", sao2_media = "93.3"), by = "id_visita") %>% # was 9.3
+  rows_update(tibble(
+    id_visita = "9c2051c6-0a9a-11e9-9997-9759725d7b76",
+    ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, # abg not performed
+    sao2_media = "94.8", ct90 = "0.8", odi3 = "7" # npo values were missing
+  ), by = "id_visita") %>%
+  rows_update(tibble(id_visita = "8c7ba494-3f97-11eb-975e-1bf97f2fdc83", pao2 = "103"), by = "id_visita") %>% # was 703
+  rows_update(tibble(id_visita = "63d362c4-d5d3-11ec-ab47-f14c5265e448", sao2_media = "94"), by = "id_visita") %>% # was 9
+  rows_update(tibble(id_visita = "ccf8c196-22e4-11e8-bd92-937d2f7100b4", odi3 = "10.6"), by = "id_visita") %>% # was 93 (% odi3)
+  rows_update(tibble(id_visita = "ffeaf23e-623f-11eb-9754-55d71760aef7", pao2 = "88", paco2 = "39"), by = "id_visita") %>% # values were flipped
+  rows_update(tibble(id_visita = "c41240dc-5c5b-11e9-8681-5b6191ee60f9", sao2_media = "94.3"), by = "id_visita") %>% # was 74.3
+  rows_update(tibble(id_visita = "71003c71-6b7f-4fc2-a83a-a44821e3621e", pao2 = NA, paco2 = NA), by = "id_visita") %>% # incomplete abg
+  rows_update(tibble(id_visita = "e0289aae-47b3-11e8-915c-1db1c3288c02", hco3 = "33"), by = "id_visita") %>% # was 3
+  rows_update(tibble(id_visita = "12751d79-dd06-498e-afd9-29ffaf60b1d3", paco2 = NA), by = "id_visita") %>% # technical issue
+  rows_update(tibble(
+    id_visita = "706ffe1c-847b-11ea-845f-91a37060d068",
+    ph_sangre_arterial = "7.33", pao2 = "78", paco2 = "60", hco3 = "35" # wrong values
+  ), by = "id_visita") %>%
+  rows_update(tibble(id_visita = "d0a1048e-e13c-11ea-96e9-e996c45a8003", pao2 = "98", hco3 = "19"), by = "id_visita") %>% # pao2 was 9, hco3 was missing
+  rows_update(tibble(id_visita = "d5bf94aa-b169-11eb-9be1-99c56818900c", sao2_media = "92.5"), by = "id_visita") %>% # was 82
+  rows_update(tibble(id_visita = "a3102824-202a-11eb-8053-a39cb1e6e4aa", pao2 = "111"), by = "id_visita") %>% # was 11
+  rows_update(tibble(id_visita = "f681649a-9a4a-11e8-a76b-393315964526", pao2 = "69", paco2 = "49"), by = "id_visita") %>% # values were flipped
+  rows_update(tibble(id_visita = "7d97e41e-fefd-11e9-b2bc-2bd7e660e45b", pao2 = "109"), by = "id_visita") %>% # was 19
+  rows_update(tibble(id_visita = "a87b7260-3ece-11eb-9cb0-9f6fd3cfe09e", pao2 = "80"), by = "id_visita") %>% # was 20
+  rows_update(tibble(
+    id_visita = "c6e2f65a-5cc0-11eb-b70c-0d37f12d66de",
+    ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA
+  ), by = "id_visita") %>% # abg from patient hospitalization
+  rows_update(tibble(id_visita = "84c8850e-6345-11e8-8914-9b10f80dedd0", pao2 = "96"), by = "id_visita") %>% # was 38
+  rows_update(tibble(
+    id_visita = "e909b338-452b-11eb-8233-33820674d089",
+    ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA
+  ), by = "id_visita") %>% # abg not performed
+  rows_update(tibble(id_visita = "eb2f3d4c-1f59-11eb-b9a3-f574dce5bdba", pao2 = "103"), by = "id_visita") %>% # contained paco2
+  rows_update(tibble(id_visita = "cc7a960e-0f95-11eb-9cdd-5b494bd8f088", pao2 = "117"), by = "id_visita") %>% # contained paco2
+  rows_update(tibble(
+    id_visita = "b99541cf-5266-4b62-b7fd-af8b247803e1",
+    ph_sangre_arterial = "7.43", pao2 = "87", paco2 = "38", hco3 = "25"
+  ), by = "id_visita") %>% # values were wrong
+  rows_update(tibble(
+    id_visita = "401a29a2-eaf2-47b7-aecf-ece888c64ec9",
+    ph_sangre_arterial = "7.44", hco3 = "27"
+  ), by = "id_visita") %>% # values were missing
+  rows_update(tibble(id_visita = "7b6375dc-4380-11eb-aaf4-eb9c15baf06f", fecha_visita = "18-12-2020"), by = "id_visita") %>% # wrong date
+  rows_update(tibble(id_visita = "b84ee5f0-ee2c-11ec-a57d-b98b14e27f3f", fvc_sentado_absoluto = "1980"), by = "id_visita") %>% # was 7980
+  rows_update(tibble(id_visita = "3d614c76-48f5-11eb-b52b-1f59d77403aa", fvc_sentado_absoluto = "2790"), by = "id_visita") %>% # was 7890
+  rows_update(tibble(
+    id_visita = "d27161ca-b16e-11eb-9be1-99c56818900c",
+    fvc_sentado = "155", fvc_sentado_absoluto = "4160"
+  ), by = "id_visita") %>% # values were flipped
   mutate(
     across(!c(ends_with("_cual"), cumplimiento_cpap), \(x) ufmn_parse_na(x, na_empty = TRUE)),
     across(starts_with("fecha"), ufmn_parse_date),
