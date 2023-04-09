@@ -350,7 +350,7 @@ ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
   rows_update(tibble(id_visita = "2d8c9ed8-899d-11ec-ba66-03eb67e47b69", estatura = "166"), by = "id_visita") %>%
   rows_update(tibble(id_visita = "d2327cb2-08e8-11ed-a5ea-eb25c156d89d", imc = NA), by = "id_visita") %>%
   rows_update(tibble(id_visita = "2d8c9ed8-899d-11ec-ba66-03eb67e47b69", imc = NA), by = "id_visita") %>%
-  mutate(across(starts_with("fecha_"), \(x) ifelse(x == "29-02-2015", "28-02-2015", x))) %>%
+  mutate(across(starts_with("fecha_"), \(x) if_else(x == "29-02-2015", "28-02-2015", x))) %>%
   mutate(across(everything(), ufmn_parse_na),
     across(starts_with("fecha"), ufmn_parse_date),
     across(c(
@@ -367,7 +367,7 @@ ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
     across(starts_with("motivo_indicacion_"), \(x) {
       ufmn_parse_logical(x, true = "TRUE", false = "FALSE")
     }),
-    imc = ifelse(!is.na(imc), imc, round(peso / (estatura / 100)^2, 2)),
+    imc = if_else(!is.na(imc), imc, round(peso / (estatura / 100)^2, 2)),
     uso_peg = ufmn_parse_peg_usage(uso_peg),
     disfagia = ufmn_parse_dysphagia(disfagia)
   ) %>%
@@ -808,8 +808,8 @@ ufmn_functional %<>%
     by = "id_visita", multiple = "all"
   ) %>%
   mutate(
-    cortar_con_peg = ifelse(cortar == cortar_con_peg, cortar_con_peg, NA),
-    cortar_sin_peg = ifelse(cortar == cortar_sin_peg, cortar_sin_peg, NA)
+    cortar_con_peg = if_else(cortar == cortar_con_peg, cortar_con_peg, NA_integer_),
+    cortar_sin_peg = if_else(cortar == cortar_sin_peg, cortar_sin_peg, NA_integer_)
   ) %>%
   rowwise() %>%
   mutate(
