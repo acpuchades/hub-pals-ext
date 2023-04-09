@@ -11,14 +11,14 @@ source("src/metrosud.r")
 source("src/sectecnica.r")
 
 pals_recode_sex <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     Hombre = "Male",
     Mujer = "Female"
   )
 }
 
 pals_recode_studies <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     Otros = "Other",
     Analfabeto = "Illiterate",
     `Primarios incompletos` = "Primary education (incomplete)",
@@ -31,7 +31,7 @@ pals_recode_studies <- function(data) {
 }
 
 pals_recode_working_status <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     Otros = "Other",
     Trabaja = "Working",
     `Labores de la casa` = "Working at home",
@@ -43,7 +43,7 @@ pals_recode_working_status <- function(data) {
 }
 
 pals_recode_phenotype <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     AMP = "PMA",
     ELP = "PLS",
     `ELA Bulbar` = "Bulbar",
@@ -57,7 +57,7 @@ pals_recode_phenotype <- function(data) {
 }
 
 pals_recode_smoking_status <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     Fumador = "Active",
     Exfumador = "Ceased",
     `No fumador` = "Never"
@@ -65,7 +65,7 @@ pals_recode_smoking_status <- function(data) {
 }
 
 pals_recode_cognitive_status <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     DTA = "AD",
     DFT = "FTD",
     `DCL-Cognitivo` = "MCI",
@@ -76,7 +76,7 @@ pals_recode_cognitive_status <- function(data) {
 }
 
 pals_recode_weakness_pattern <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     Respiratoria = "Respiratory",
     MMSS = "Upper limbs",
     MMII = "Lower limbs",
@@ -85,7 +85,7 @@ pals_recode_weakness_pattern <- function(data) {
 }
 
 pals_recode_mn_involvement <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     Ninguno = "None",
     MNS = "UMN",
     MNI = "LMN",
@@ -94,7 +94,7 @@ pals_recode_mn_involvement <- function(data) {
 }
 
 pals_recode_discharge_type <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     `Alta voluntaria` = "DAMA",
     Domicilio = "Planned",
     Fuga = "Abscond",
@@ -108,11 +108,11 @@ pals_recode_discharge_type <- function(data) {
 }
 
 pals_recode_genetic_result <- function(data) {
-  data %>% recode_factor(Alterado = "Altered")
+  data |> recode_factor(Alterado = "Altered")
 }
 
 pals_recode_dysphagia <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     No = "None",
     Liquidos = "Liquids",
     Solidos = "Solids",
@@ -121,7 +121,7 @@ pals_recode_dysphagia <- function(data) {
 }
 
 pals_recode_peg_usage <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     Hidratacion = "Hydration",
     `Hidratacion + Medicacion` = "Hydration + Medication",
     `Hidratacion + Medicacion + Nutricion parcial` =
@@ -131,7 +131,7 @@ pals_recode_peg_usage <- function(data) {
 }
 
 pals_recode_gpvars_names <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     ABVDB = "Barthel",
     SITEN06 = "Barthel",
     SITGE05 = "Barthel",
@@ -145,7 +145,7 @@ pals_recode_gpvars_names <- function(data) {
 }
 
 pals_recode_income_source <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     `No ingresos` = "None",
     `En paro` = "Unemployment aid",
     Trabaja = "Work",
@@ -159,7 +159,7 @@ pals_recode_income_source <- function(data) {
 }
 
 pals_recode_application_status <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     Tramitada = TRUE,
     `Pendiente` = FALSE,
     `No tramitada` = FALSE
@@ -167,7 +167,7 @@ pals_recode_application_status <- function(data) {
 }
 
 pals_recode_disability_level <- function(data) {
-  data %>% recode_factor(
+  data |> recode_factor(
     IT = "Temporary",
     IPP = "Partial",
     IPT = "Total",
@@ -184,8 +184,8 @@ pals_last_followups <- ufmn_patients |>
   rename(last_followup = "fecha_visita") |>
   select(patient_id = id_paciente, last_followup)
 
-pals_patients <- ufmn_patients %>%
-  inner_join(ufmn_clinical, by = "id_paciente") %>%
+pals_patients <- ufmn_patients |>
+  inner_join(ufmn_clinical, by = "id_paciente") |>
   select(!c(
     provincia_nacimiento,
     provincia_residencia,
@@ -206,7 +206,7 @@ pals_patients <- ufmn_patients %>%
     fenotipo_al_diagnostico_otro,
     fenotipo_al_exitus_otro,
     resultado_estudio_cognitivo_otros
-  )) %>%
+  )) |>
   rename(
     patient_id = id_paciente,
     hospital_id = nhc,
@@ -223,7 +223,7 @@ pals_patients <- ufmn_patients %>%
     riluzole_start = fecha_inicio_riluzol,
     death = exitus,
     death_date = fecha_exitus,
-  ) %>%
+  ) |>
   mutate(
     site = "Bellvitge Hospital (Barcelona)",
     sex = pals_recode_sex(sexo),
@@ -236,18 +236,18 @@ pals_patients <- ufmn_patients %>%
     mn_involvement = pals_recode_mn_involvement(afectacion_motoneurona_inicial),
     mn_predominance = pals_recode_mn_involvement(predominio_motoneurona_inicial),
     weakness_pattern = pals_recode_weakness_pattern(patron_debilidad_inicial),
-    death_cause = ufmn_patients %>%
+    death_cause = ufmn_patients |>
       left_join(pram_cases, by = "cip") %$%
       case_when(
         estado == "Expedient finalitzat" ~ "euthanasia"
       ),
     .keep = "unused",
-  ) %>%
-  left_join(pals_last_followups, by = "patient_id") %>%
-  relocate(site, .before = everything()) %>%
+  ) |>
+  left_join(pals_last_followups, by = "patient_id") |>
+  relocate(site, .before = everything()) |>
   relocate(death_cause, .after = death_date)
 
-pals_alsfrs <- ufmn_functional %>%
+pals_alsfrs <- ufmn_functional |>
   rename(
     patient_id = id_paciente,
     assessment_id = id_visita,
@@ -269,34 +269,34 @@ pals_alsfrs <- ufmn_functional %>%
     alsfrs_fine_motor = alsfrs_motor_fino,
     alsfrs_gross_motor = alsfrs_motor_grosero,
     alsfrs_respiratory = alsfrs_respiratorio
-  ) %>%
+  ) |>
   semi_join(pals_patients, by = "patient_id")
 
-pals_er_episodes <- sectecnica_urg_episodios %>%
+pals_er_episodes <- sectecnica_urg_episodios |>
   rename(
     hospital_id = nhc,
     episode_id = episodio,
     admission_date = fecha_entrada,
     discharge_date = fecha_salida,
     destination_centre = centro_destino_al_alta
-  ) %>%
+  ) |>
   mutate(
     discharge_type = pals_recode_discharge_type(destino_al_alta),
     .keep = "unused",
-  ) %>%
-  relocate(hospital_id, .before = everything()) %>%
+  ) |>
+  relocate(hospital_id, .before = everything()) |>
   relocate(discharge_type, .after = discharge_date)
 
-pals_er_diagnoses <- sectecnica_urg_diagnosticos %>%
+pals_er_diagnoses <- sectecnica_urg_diagnosticos |>
   rename(
     episode_id = episodio,
     dx_code = cod_diagnostico,
     dx_description = desc_diagnostico,
     dx_encoding = codif_diagnostico
-  ) %>%
+  ) |>
   drop_na(dx_code)
 
-pals_genetics <- ufmn_clinical %>%
+pals_genetics <- ufmn_clinical |>
   select(
     patient_id = id_paciente,
     c9_status = estudio_gen_c9,
@@ -304,15 +304,15 @@ pals_genetics <- ufmn_clinical %>%
     atxn2_status = estudio_gen_atxn2,
     kennedy_status = estudio_gen_kennedy,
     other_genes = estudio_gen_otros
-  ) %>%
+  ) |>
   mutate(
     across(ends_with("_status"), pals_recode_genetic_result),
   )
 
-pals_hospitalizations <- sectecnica_hosp %>%
+pals_hospitalizations <- sectecnica_hosp |>
   mutate(
     discharge_type = pals_recode_discharge_type(destino_al_alta),
-  ) %>%
+  ) |>
   select(
     hospital_id = nhc,
     episode_id = episodio,
@@ -326,11 +326,11 @@ pals_hospitalizations <- sectecnica_hosp %>%
     destination_centre = centro_destino_al_alta
   )
 
-pals_nutrition <- ufmn_nutrition %>%
+pals_nutrition <- ufmn_nutrition |>
   mutate(
     dysphagia = pals_recode_dysphagia(disfagia),
     peg_usage = pals_recode_peg_usage(uso_peg)
-  ) %>%
+  ) |>
   select(
     patient_id = id_paciente,
     assessment_id = id_visita,
@@ -363,10 +363,10 @@ pals_nutrition <- ufmn_nutrition %>%
     enteral_suppl_start = fecha_inicio_supl_enteral,
     constipation = estreñimiento,
     laxative_usage = laxante,
-  ) %>%
+  ) |>
   semi_join(pals_patients, by = "patient_id")
 
-pals_respiratory <- ufmn_respiratory %>%
+pals_respiratory <- ufmn_respiratory |>
   select(
     patient_id = id_paciente,
     assessment_id = id_visita,
@@ -438,15 +438,15 @@ pals_imv <- vmi_data |>
     imv_start_date = "fecha_inicio_vmi"
   )
 
-pals_genesets <- imegen_paneles %>%
+pals_genesets <- imegen_paneles |>
   rename(
     geneset = panel,
     gene = gen,
     transcript = transcrito
   )
 
-pals_genetics_ext <- imegen_resultados %>%
-  left_join(ufmn_patients, by = "nhc") %>%
+pals_genetics_ext <- imegen_resultados |>
+  left_join(ufmn_patients, by = "nhc") |>
   mutate(
     genotype = recode(genotipo, heterocigosis = "heterozygous"),
     interpretation = recode(interpretacion,
@@ -454,7 +454,7 @@ pals_genetics_ext <- imegen_resultados %>%
       "Significado clinico incierto" = "Uncertain significance",
       "Factor de riesgo / susceptibilidad" = "Risk factor / susceptibility"
     )
-  ) %>%
+  ) |>
   select(
     hospital_id = nhc,
     geneset = panel,
@@ -468,9 +468,9 @@ pals_genetics_ext <- imegen_resultados %>%
     interpretation
   )
 
-pals_comorbidities <- ufmn_patients %>%
-  mutate(cip_parcial = substr(cip, 1, 13)) %>%
-  inner_join(metrosud_problemas, by = "cip_parcial", multiple = "all") %>%
+pals_comorbidities <- ufmn_patients |>
+  mutate(cip_parcial = substr(cip, 1, 13)) |>
+  inner_join(metrosud_problemas, by = "cip_parcial", multiple = "all") |>
   select(
     patient_id = id_paciente,
     dx_date = fecha_problema,
@@ -479,9 +479,9 @@ pals_comorbidities <- ufmn_patients %>%
     dx_description = desc_problema
   )
 
-pals_gpvisits <- ufmn_patients %>%
-  mutate(cip_parcial = substr(cip, 1, 13)) %>%
-  inner_join(metrosud_visitas, by = "cip_parcial", multiple = "all") %>%
+pals_gpvisits <- ufmn_patients |>
+  mutate(cip_parcial = substr(cip, 1, 13)) |>
+  inner_join(metrosud_visitas, by = "cip_parcial", multiple = "all") |>
   select(
     patient_id = id_paciente,
     date = fecha_visita,
@@ -490,9 +490,9 @@ pals_gpvisits <- ufmn_patients %>%
     dx_description = desc_problema
   )
 
-pals_treatments <- ufmn_patients %>%
-  mutate(cip_parcial = substr(cip, 1, 13)) %>%
-  inner_join(metrosud_farmacia, by = "cip_parcial", multiple = "all") %>%
+pals_treatments <- ufmn_patients |>
+  mutate(cip_parcial = substr(cip, 1, 13)) |>
+  inner_join(metrosud_farmacia, by = "cip_parcial", multiple = "all") |>
   select(
     patient_id = id_paciente,
     prescription_start = fecha_inicio,
@@ -503,13 +503,13 @@ pals_treatments <- ufmn_patients %>%
     actcompound_description = desc_principio
   )
 
-pals_social <- ufmn_patients %>%
-  inner_join(fmv_data, by = c("dni" = "nif")) %>%
+pals_social <- ufmn_patients |>
+  inner_join(fmv_data, by = c("dni" = "nif")) |>
   mutate(
-    across(c(starts_with("estado_")), pals_recode_application_status),
+    across(starts_with("estado_"), pals_recode_application_status),
     situacion_laboral = pals_recode_income_source(situacion_laboral),
     tipo_incapacidad = pals_recode_disability_level(tipo_incapacidad),
-  ) %>%
+  ) |>
   select(
     patient_id = id_paciente,
     income_source = situacion_laboral,
@@ -523,17 +523,17 @@ pals_social <- ufmn_patients %>%
     dependency_degree = grado_lapad,
   )
 
-pals_gpvars <- ufmn_patients %>%
-  mutate(cip_parcial = substr(cip, 1, 13)) %>%
-  inner_join(metrosud_variables, by = "cip_parcial", multiple = "all") %>%
+pals_gpvars <- ufmn_patients |>
+  mutate(cip_parcial = substr(cip, 1, 13)) |>
+  inner_join(metrosud_variables, by = "cip_parcial", multiple = "all") |>
   mutate(
     var_name = pals_recode_gpvars_names(cod_variable),
-  ) %>%
+  ) |>
   select(
     patient_id = id_paciente,
     date = fecha_registro,
     var_name, value = valor
-  ) %>%
+  ) |>
   drop_na(patient_id, var_name)
 
 pals_export <- function(path) {

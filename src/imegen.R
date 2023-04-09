@@ -16,7 +16,7 @@ imegen_paneles <-
     )
 
 imegen_resultados <-
-    read_excel(imegen_results_data_path) %>%
+    read_excel(imegen_results_data_path) |>
     rename(
         imegen_id = ID,
         nhc = NHC,
@@ -29,7 +29,7 @@ imegen_resultados <-
         genotipo = Genotipo,
         herencia = Herencia,
         interpretacion = `Interpretación`
-    ) %>%
+    ) |>
     mutate(
         across(nhc, as.character),
         across(c(panel, genotipo, interpretacion, herencia), factor),

@@ -1,12 +1,11 @@
-library(magrittr)
-library(stringr)
 library(dplyr)
+library(stringr)
 
 fmv_data_path <- "data/fmv-20221130.xlsx"
 
 fmv_recode_boolean <- function(data) {
-    data %>%
-        str_to_upper() %>%
+    data |>
+        str_to_upper() |>
         recode(
             SI = TRUE,
             NO = FALSE,
@@ -15,8 +14,8 @@ fmv_recode_boolean <- function(data) {
 }
 
 fmv_recode_workingstatus <- function(data) {
-    data %>%
-        str_to_upper() %>%
+    data |>
+        str_to_upper() |>
         recode_factor(
             PENDENT = NA_character_,
             `PENDENT INCAPACITAT` = NA_character_,
@@ -35,8 +34,8 @@ fmv_recode_workingstatus <- function(data) {
 }
 
 fmv_recode_status <- function(data) {
-    data %>%
-        str_to_upper() %>%
+    data |>
+        str_to_upper() |>
         recode_factor(
             `-` = NA_character_,
             SI = "Tramitada",
@@ -56,15 +55,15 @@ fmv_recode_disability <- function(data) {
 }
 
 fmv_recode_date <- function(data) {
-    data %>%
-        str_replace(r"(^(\d{2})/(\d{2})$)", r"(01/\1/\2)") %>%
-        str_replace(r"(^principis? (\d{4})$)", r"(01/01/\1)") %>%
-        str_replace(r"(^mitjans (\d{4})$)", r"(01/06/\1)") %>%
-        str_replace(r"(^(\d{4})$)", r"(01/01/\1)") %>%
+    data |>
+        str_replace(r"(^(\d{2})/(\d{2})$)", r"(01/\1/\2)") |>
+        str_replace(r"(^principis? (\d{4})$)", r"(01/01/\1)") |>
+        str_replace(r"(^mitjans (\d{4})$)", r"(01/06/\1)") |>
+        str_replace(r"(^(\d{4})$)", r"(01/01/\1)") |>
         lubridate::dmy(quiet = TRUE)
 }
 
-fmv_data <- readxl::read_excel(fmv_data_path) %>%
+fmv_data <- readxl::read_excel(fmv_data_path) |>
     select(
         nif = NIF,
         cuidador_profesional = `Cuidador professional`,
@@ -79,7 +78,7 @@ fmv_data <- readxl::read_excel(fmv_data_path) %>%
         estado_incapacidad = `Incapacitat`,
         fecha_tramite_incapacidad = `Data solicitud incapacitat`,
         tipo_incapacidad = `Tipus incapacitat`,
-    ) %>%
+    ) |>
     mutate(
         across(starts_with("fecha_"), fmv_recode_date),
         across(starts_with("estado_"), fmv_recode_status),

@@ -1,5 +1,4 @@
 library(dplyr)
-library(magrittr)
 library(purrr)
 library(stringr)
 library(stringi)
@@ -12,17 +11,17 @@ ufmn_data_path <- "data/ufmn-2023_01_18.sqlite"
 
 ufmn_parse_na <- function(data, na_empty = FALSE) {
   if (na_empty) {
-    data %<>% na_if("")
+    data <- data |> na_if("")
   }
 
-  data %>%
-    na_if("-") %>%
+  data |>
+    na_if("-") |>
     na_if("NS/NC")
 }
 
 ufmn_parse_date <- function(data) {
-  data %>%
-    ufmn_parse_na(na_empty = TRUE) %>%
+  data |>
+    ufmn_parse_na(na_empty = TRUE) |>
     as.Date(format = "%d-%m-%Y")
 }
 
@@ -34,20 +33,20 @@ ufmn_parse_logical <- function(data, true, false) {
 }
 
 ufmn_parse_factor <- function(data, ...) {
-  data %>%
-    ufmn_parse_na(na_empty = TRUE) %>%
+  data |>
+    ufmn_parse_na(na_empty = TRUE) |>
     factor(...)
 }
 
 ufmn_parse_studies <- function(data) {
-  data %>%
+  data |>
     recode(
       `No sabe leer ni escribir` = "Analfabeto",
       `Secundarios (ESO, BUP, COU, etc)` = "Secundarios",
       `FP (grado medio o superior)` = "Formacion profesional",
       Universidad = "Universitarios",
       Otro = "Otros"
-    ) %>%
+    ) |>
     ufmn_parse_factor(
       levels = c(
         "Otros",
@@ -64,25 +63,25 @@ ufmn_parse_studies <- function(data) {
 }
 
 ufmn_parse_working_status <- function(data) {
-  data %>%
+  data |>
     recode(
       Parado = "En paro (sin subsidio)",
       `Parado con subsidio | Prestación` = "En paro (con subsidio)",
       `Incapacitado (o con invalidez permanente)` = "Incapacitado",
       Otra = "Otros"
-    ) %>%
+    ) |>
     ufmn_parse_factor()
 }
 
 ufmn_parse_genetic_result <- function(data, ...) {
-  data %>%
+  data |>
     ufmn_parse_factor(levels = c("Normal", "Alterado"), ...)
 }
 
 ufmn_parse_municipality <- function(data) {
-  data %>%
-    ufmn_parse_na() %>%
-    str_replace("L'\\s+", "L'") %>%
+  data |>
+    ufmn_parse_na() |>
+    str_replace("L'\\s+", "L'") |>
     recode(
       `FERROL (2)` = "FERROL",
       `MOLÃƒÂ D'AVALL` = "MOLI D'AVALL",
@@ -90,19 +89,19 @@ ufmn_parse_municipality <- function(data) {
       `SANT JOAN DE VILATORRSANT JOAN DE VILASANT JOAN DE VILATORRADATORRADAADA` = "SANT JOAN DE VILATORRADA",
       `SANT SADURNÃ D'ANOIA` = "SANT SADURNI D'ANOIA",
       `SANT LLORENÃƒÆ’Ã¢â‚¬Â¡ D'HORTONS` = "SANT LLORENÇ D'HORTONS"
-    ) %>%
+    ) |>
     stri_trans_general(id = "Latin-ASCII")
 }
 
 ufmn_parse_cognitive <- function(data) {
-  data %>%
+  data |>
     recode(
       `Deterioro Cognitivo Leve cognitivo (DCL cognitivo)` = "DCL-Cognitivo",
       `Deterioro Cognitivo Leve conductual (DCL conductual)` = "DCL-Conductual",
       `Deterioro Cognitivo Leve mixto (DCL mixto)` = "DCL-Mixto",
       `Demencia frontotemporal` = "DFT",
       `Demencia tipo alzheimer` = "DTA"
-    ) %>%
+    ) |>
     ufmn_parse_factor(levels = c(
       "Otros", "Normal",
       "DCL-Cognitivo", "DCL-Conductual",
@@ -111,7 +110,7 @@ ufmn_parse_cognitive <- function(data) {
 }
 
 ufmn_parse_phenotype <- function(data) {
-  data %>%
+  data |>
     recode(
       `Atrofia Muscular Progresiva (AMP)` = "AMP",
       `Esclerosis Lateral Primaria (ELP)` = "ELP",
@@ -121,13 +120,13 @@ ufmn_parse_phenotype <- function(data) {
       `Hemipléjica (Mills)` = "Hemiplejica",
       `Monomiélica` = "Monomielica",
       `Pseudopolineurítica` = "Pseudopolineuritica"
-    ) %>%
+    ) |>
     ufmn_parse_factor()
 }
 
 ufmn_parse_distribution <- function(data) {
-  data %>%
-    str_split("@", n = 3) %>%
+  data |>
+    str_split("@", n = 3) |>
     map_chr(\(xs)
     case_when(
       any(xs == "MMSS") ~ "MMSS",
@@ -140,7 +139,7 @@ ufmn_parse_distribution <- function(data) {
       any(str_detect(xs, "GENERALIZAD[OA]")) ~ "MMSS+MMII",
       any(xs == "BULBAR") ~ "Bulbar",
       any(str_detect(xs, "RESPIRATORI[OA]")) ~ "Respiratoria",
-    )) %>%
+    )) |>
     ufmn_parse_factor(levels = c(
       "Bulbar",
       "Respiratoria",
@@ -151,21 +150,21 @@ ufmn_parse_distribution <- function(data) {
 }
 
 ufmn_parse_involvement <- function(data) {
-  data %>%
-    str_split("@", n = 3) %>%
+  data |>
+    str_split("@", n = 3) |>
     map_chr(\(xs)
     case_when(
       any(xs == "BMN") ~ "MNS+MNI",
       any(xs == "UMN->BMN") ~ "MNS",
       any(xs == "UMN") ~ "MNS",
       any(xs == "LMN") ~ "MNI",
-    )) %>%
+    )) |>
     ufmn_parse_factor(levels = c("MNS", "MNI", "MNS+MNI"))
 }
 
 ufmn_parse_predominance <- function(data) {
-  data %>%
-    str_split("@", n = 3) %>%
+  data |>
+    str_split("@", n = 3) |>
     map_chr(\(xs) {
       xs <- rev(xs) # afectación @ predominio @ debilidad
       case_when(
@@ -177,7 +176,7 @@ ufmn_parse_predominance <- function(data) {
         any(xs == "UMN") ~ "MNS",
         any(xs == "LMN") ~ "MNI",
       )
-    }) %>%
+    }) |>
     ufmn_parse_factor(levels = c("Ninguno", "MNS", "MNI"))
 }
 
@@ -186,12 +185,12 @@ ufmn_parse_resultado_estudio_atxn2 <- function(data) {
   normal_re <- regex("\\bNORMAL\\b", ignore_case = TRUE)
   intermediate_re <- regex("\\bINTERMEDI[AO]?\\b", ignore_case = TRUE)
 
-  data %>%
-    str_split("@", n = 3) %>%
+  data |>
+    str_split("@", n = 3) |>
     map_chr(\(xs) case_when(
       any(str_detect(xs, atxn2_re) & str_detect(xs, normal_re)) ~ "Normal",
       any(str_detect(xs, atxn2_re) & str_detect(xs, intermediate_re)) ~ "Alterado"
-    )) %>%
+    )) |>
     ufmn_parse_genetic_result()
 }
 
@@ -200,31 +199,31 @@ ufmn_parse_resultado_estudio_kennedy <- function(data) {
   normal_re <- regex("\\bNORMAL\\b", ignore_case = TRUE)
   positive_re <- regex("\\bPOSITIVO\\b", ignore_case = TRUE)
 
-  data %>%
+  data |>
     map_chr(\(xs) case_when(
       any(str_detect(xs, kennedy_re) & str_detect(xs, normal_re)) ~ "Normal",
       any(str_detect(xs, kennedy_re) & str_detect(xs, positive_re)) ~ "Alterado",
-    )) %>%
+    )) |>
     ufmn_parse_genetic_result()
 }
 
 ufmn_parse_dysphagia <- function(data) {
-  data %>%
+  data |>
     recode(
       `Sí sólidos` = "Solidos",
       `Sí líquidos` = "Liquidos",
       `Sí líquidos y sólidos` = "Mixta"
-    ) %>%
+    ) |>
     ufmn_parse_factor(levels = c("No", "Solidos", "Liquidos", "Mixta"))
 }
 
 ufmn_parse_peg_usage <- function(data) {
-  data %>%
+  data |>
     recode(
       HidratacionMeditacion = "Hidratacion + Medicacion",
       `HidratacionMedicaciónNutricionParcial` = "Hidratacion + Medicacion + Nutricion parcial",
       NutricionCompleta = "Nutricion completa"
-    ) %>%
+    ) |>
     ufmn_parse_factor(levels = c(
       "Hidratacion",
       "Hidratacion + Medicacion",
@@ -235,16 +234,16 @@ ufmn_parse_peg_usage <- function(data) {
 
 ufmn_db <- DBI::dbConnect(RSQLite::SQLite(), ufmn_data_path)
 
-ufmn_patients <- DBI::dbReadTable(ufmn_db, "pacientes") %>%
-  select(!c(id, created_datetime:updated_datetime)) %>%
+ufmn_patients <- DBI::dbReadTable(ufmn_db, "pacientes") |>
+  select(!c(id, created_datetime:updated_datetime)) |>
   rename(
     id_paciente = pid,
     situacion_laboral_al_inicio = situacion_laboral_actual,
     situacion_laboral_al_inicio_otro = situacion_laboral_actual_otra,
     ultima_ocupacion_al_inicio = ultima_ocupacion,
     estudios_otros = estudios_otro_cual
-  ) %>%
-  rows_delete(tibble(id_paciente = "9342fe7c-d949-11e9-842a-ebf9c1d8fdac"), by = "id_paciente") %>% # no data
+  ) |>
+  rows_delete(tibble(id_paciente = "9342fe7c-d949-11e9-842a-ebf9c1d8fdac"), by = "id_paciente") |> # no data
   mutate(
     across(everything(), ufmn_parse_na),
     across(nhc, \(x) x |>
@@ -257,12 +256,11 @@ ufmn_patients <- DBI::dbReadTable(ufmn_db, "pacientes") %>%
     estudios = ufmn_parse_studies(estudios),
     situacion_laboral_al_inicio = ufmn_parse_working_status(situacion_laboral_al_inicio),
     municipio_residencia = ufmn_parse_municipality(municipio_residencia)
-  ) %>%
-  relocate(cip, .after = nhc) %>%
-  structure(class = c("ufmn", class(.)))
+  ) |>
+  relocate(cip, .after = nhc)
 
-ufmn_clinical <- DBI::dbReadTable(ufmn_db, "datos_clinicos") %>%
-  select(!c(estudio_genetico_c9:estudio_genetico_sod1, created_datetime:updated_datetime)) %>%
+ufmn_clinical <- DBI::dbReadTable(ufmn_db, "datos_clinicos") |>
+  select(!c(estudio_genetico_c9:estudio_genetico_sod1, created_datetime:updated_datetime)) |>
   rename(
     id_paciente = pid,
     fecha_primera_visita = fecha_visita_datos_clinicos,
@@ -277,7 +275,7 @@ ufmn_clinical <- DBI::dbReadTable(ufmn_db, "datos_clinicos") %>%
     estudio_gen_c9 = resultado_estudio_c9,
     estudio_gen_sod1 = resultado_estudio_sod1,
     estudio_gen_otros = estudio_genetico_otro
-  ) %>%
+  ) |>
   mutate(across(everything(), ufmn_parse_na),
     across(starts_with("fecha"), ufmn_parse_date),
     across(c(
@@ -301,31 +299,31 @@ ufmn_clinical <- DBI::dbReadTable(ufmn_db, "datos_clinicos") %>%
     estudio_gen_sod1 = ufmn_parse_genetic_result(estudio_gen_sod1),
     estudio_gen_atxn2 = ufmn_parse_resultado_estudio_atxn2(estudio_gen_otros),
     estudio_gen_kennedy = ufmn_parse_resultado_estudio_kennedy(estudio_gen_otros)
-  ) %>%
-  select(!c(id, distribucion_al_inicio)) %>%
-  relocate(fumador, .after = fenotipo_al_exitus_otro) %>%
+  ) |>
+  select(!c(id, distribucion_al_inicio)) |>
+  relocate(fumador, .after = fenotipo_al_exitus_otro) |>
   relocate(starts_with("historia_familiar_motoneurona"),
     .after = historia_familiar
-  ) %>%
+  ) |>
   relocate(starts_with("historia_familiar_alzheimer"),
     .after = historia_familiar_alzheimer
-  ) %>%
+  ) |>
   relocate(starts_with("historia_familiar_parkinson"),
     .after = historia_familiar_parkinson
-  ) %>%
+  ) |>
   relocate(historia_familiar_otros,
     .after = historia_familiar_parkinson_grado
-  ) %>%
+  ) |>
   relocate(patron_debilidad_inicial:predominio_motoneurona_inicial,
     .after = everything()
-  ) %>%
+  ) |>
   relocate(starts_with("estudio_gen_") & !ends_with("_otros"),
     .after = everything()
-  ) %>%
-  relocate(estudio_gen_otros, .after = everything()) %>%
+  ) |>
+  relocate(estudio_gen_otros, .after = everything()) |>
   relocate(ends_with("riluzol"), .after = everything())
 
-ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
+ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") |>
   rename(
     id_visita = id,
     id_paciente = pid,
@@ -337,20 +335,20 @@ ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
     retirada_peg = retirada,
     supl_oral = suplementacion_nutricional_oral,
     supl_enteral = suplementacion_nutricional_entera,
-  ) %>%
-  rows_delete(tibble(id_visita = "8f1916dc-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
-  rows_delete(tibble(id_visita = "95ba295e-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
-  rows_update(tibble(id_paciente = "29e0933e-11e9-11eb-86f8-ad4d5277349f", peso_premorbido = "124"), by = "id_paciente") %>% # was 126
-  rows_update(tibble(id_visita = "40c68842-eeb1-4cd2-a0d8-c5cbc839730c", fecha_visita = NA), by = "id_visita") %>% # was '99-99-9999'
-  rows_update(tibble(id_visita = "67e615f4-5f01-11eb-a21b-8316bff80df0", fecha_visita = "03-12-2019"), by = "id_visita") %>% # was 03-12-20219
-  rows_update(tibble(id_visita = "f9054526-1dcc-11eb-bb4a-9745fc970131", fecha_indicacion_peg = "23-10-2020"), by = "id_visita") %>% # was 23-10-20020
-  rows_update(tibble(id_visita = "8c5b0f46-df7a-11e9-9c30-274ab37b3217", fecha_indicacion_peg = "20-07-3018"), by = "id_visita") %>% # was 20-07-3018
-  rows_update(tibble(id_visita = "eb700688-3dfe-11eb-9383-d3a3b2195eff", fecha_complicacion_peg = "22-11-2020"), by = "id_visita") %>% # was 22-11-202
-  rows_update(tibble(id_visita = "d2327cb2-08e8-11ed-a5ea-eb25c156d89d", estatura = "150"), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "2d8c9ed8-899d-11ec-ba66-03eb67e47b69", estatura = "166"), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "d2327cb2-08e8-11ed-a5ea-eb25c156d89d", imc = NA), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "2d8c9ed8-899d-11ec-ba66-03eb67e47b69", imc = NA), by = "id_visita") %>%
-  mutate(across(starts_with("fecha_"), \(x) if_else(x == "29-02-2015", "28-02-2015", x))) %>%
+  ) |>
+  rows_delete(tibble(id_visita = "8f1916dc-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") |> # study artifact
+  rows_delete(tibble(id_visita = "95ba295e-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") |> # study artifact
+  rows_update(tibble(id_paciente = "29e0933e-11e9-11eb-86f8-ad4d5277349f", peso_premorbido = "124"), by = "id_paciente") |> # was 126
+  rows_update(tibble(id_visita = "40c68842-eeb1-4cd2-a0d8-c5cbc839730c", fecha_visita = NA), by = "id_visita") |> # was '99-99-9999'
+  rows_update(tibble(id_visita = "67e615f4-5f01-11eb-a21b-8316bff80df0", fecha_visita = "03-12-2019"), by = "id_visita") |> # was 03-12-20219
+  rows_update(tibble(id_visita = "f9054526-1dcc-11eb-bb4a-9745fc970131", fecha_indicacion_peg = "23-10-2020"), by = "id_visita") |> # was 23-10-20020
+  rows_update(tibble(id_visita = "8c5b0f46-df7a-11e9-9c30-274ab37b3217", fecha_indicacion_peg = "20-07-3018"), by = "id_visita") |> # was 20-07-3018
+  rows_update(tibble(id_visita = "eb700688-3dfe-11eb-9383-d3a3b2195eff", fecha_complicacion_peg = "22-11-2020"), by = "id_visita") |> # was 22-11-202
+  rows_update(tibble(id_visita = "d2327cb2-08e8-11ed-a5ea-eb25c156d89d", estatura = "150"), by = "id_visita") |>
+  rows_update(tibble(id_visita = "2d8c9ed8-899d-11ec-ba66-03eb67e47b69", estatura = "166"), by = "id_visita") |>
+  rows_update(tibble(id_visita = "d2327cb2-08e8-11ed-a5ea-eb25c156d89d", imc = NA), by = "id_visita") |>
+  rows_update(tibble(id_visita = "2d8c9ed8-899d-11ec-ba66-03eb67e47b69", imc = NA), by = "id_visita") |>
+  mutate(across(starts_with("fecha_"), \(x) if_else(x == "29-02-2015", "28-02-2015", x))) |>
   mutate(across(everything(), ufmn_parse_na),
     across(starts_with("fecha"), ufmn_parse_date),
     across(c(
@@ -370,11 +368,11 @@ ufmn_nutrition <- DBI::dbReadTable(ufmn_db, "datos_antro") %>%
     imc = if_else(!is.na(imc), imc, round(peso / (estatura / 100)^2, 2)),
     uso_peg = ufmn_parse_peg_usage(uso_peg),
     disfagia = ufmn_parse_dysphagia(disfagia)
-  ) %>%
-  select(!c(created_datetime:updated_datetime)) %>%
+  ) |>
+  select(!c(created_datetime:updated_datetime)) |>
   arrange(id_paciente, fecha_visita)
 
-ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") %>%
+ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") |>
   rename(
     id_visita = id,
     id_paciente = pid,
@@ -383,115 +381,115 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") %>%
     tipo_patologia_respiratoria_intersticial = tipo_patologia_respiratoria_patologia_instersticial,
     sas_apneas_no_claramente_obstructivas = sas_apneas_no_claramanete_obstructivas,
     indicacion_vmni = vmni_indicacion,
-  ) %>%
-  rows_delete(tibble(id_visita = "a5c3cdf0-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
-  rows_delete(tibble(id_visita = "a9960e16-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") %>% # study artifact
-  rows_update(tibble(id_visita = "c2049bdf-4a91-43e0-b6c4-f770881b7499", fecha_visita = NA), by = "id_visita") %>% # was 99-99-9999
-  rows_update(tibble(id_visita = "a3608f72-82eb-11e9-aed7-57f320d0dba4", fecha_realizacion_polisomnografia = NA), by = "id_visita") %>% # was 14
-  rows_update(tibble(id_visita = "f508e4b8-db93-11e9-b372-090a91bd3693", fecha_realizacion_polisomnografia = NA), by = "id_visita") %>% # was 14
-  rows_update(tibble(id_visita = "31f94d2a-fb08-11e9-b780-81f732616a71", odi3 = NA), by = "id_visita") %>% # was 17/7
-  rows_update(tibble(id_visita = "a0a869b6-526b-44f3-9137-044c30b29551", fvc_estirado_absoluto = "2450"), by = "id_visita") %>% # was 24500
-  rows_update(tibble(id_visita = "1915a65d-ecd0-4390-b60f-a87ea269898d", ct90 = NA, sao2_media = NA), by = "id_visita") %>% # multiple errors
-  rows_update(tibble(id_visita = "0a668c6e-89ee-11e8-8428-29c4852a0217", hco3 = "33"), by = "id_visita") %>% # was 3
-  rows_update(tibble(id_visita = "172665b8-47b4-11e8-915c-1db1c3288c02", fvc_sentado_absoluto = "920", fvc_estirado_absoluto = "920"), by = "id_visita") %>% # both were 9100
-  rows_update(tibble(id_visita = "2786aece-9a1e-11e8-9eb2-af099be7b978", ct90 = "6"), by = "id_visita") %>% # was 99.7
-  rows_update(tibble(id_visita = "3f94f6b5-0478-413c-96a4-86607e149447", pao2 = "102", paco2 = "32", hco3 = "21"), by = "id_visita") %>% # values were flipped or missing
-  rows_update(tibble(id_visita = "7ee47f8a-bdf0-4db2-88b2-5f1d2ac28061", ct90 = "0.8", sao2_media = "95.98"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "7dcc96e9-7c4d-4535-a069-916574678a2c", ph_sangre_arterial = "7.46", hco3 = "27"), by = "id_visita") %>% # values were missing
-  rows_update(tibble(id_visita = "613d31ec-fd2f-42c2-8ef8-fb90b0704bea", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") %>% # abg not performed
-  rows_update(tibble(id_visita = "e8d20b44-9d34-4f8a-b076-2c1eb51473fc", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") %>% # abg not performed
-  rows_update(tibble(id_visita = "7dd109f6-ce38-11e9-8beb-d1a9b58e35a5", fvc_estirado = "89"), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "f8ed6057-1f8f-4364-b39d-af298e032b8d", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") %>% # abg not performed
-  rows_update(tibble(id_visita = "41b51e5e-ce28-11e9-8beb-d1a9b58e35a5", pim = "18"), by = "id_visita") %>% # was 218
-  rows_update(tibble(id_visita = "1d3044ed-6c4b-4c87-9a8f-522c92e4bbe4", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") %>% # abg not performed
-  rows_update(tibble(id_visita = "ef41001c-8e86-4d5f-a340-cec5d0291c53", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") %>% # abg not performed
-  rows_update(tibble(id_visita = "66462823-8dfd-4654-a9ef-2200c618b13f", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") %>% # abg not performed
-  rows_update(tibble(id_visita = "e45cdc18-1da2-11ea-a82e-af00877d97ef", fvc_sentado_absoluto = "4120"), by = "id_visita") %>% # was 41200
-  rows_update(tibble(id_visita = "38156092-e761-11e8-807a-7b0007981048", hco3 = "26"), by = "id_visita") %>% # was 2
-  rows_update(tibble(id_visita = "5ebd2a1e-4945-11e8-a423-f10b658f4c3d", ct90 = "6"), by = "id_visita") %>% # was 90.6
-  rows_update(tibble(id_visita = "2e051a84-837e-11e9-9ede-f367b00f4244", ct90 = "3"), by = "id_visita") %>% # was 90.3
-  rows_update(tibble(id_visita = "f53b17fe-837c-11e9-9ede-f367b00f4244", ct90 = "0"), by = "id_visita") %>% # was 90.0
-  rows_update(tibble(id_visita = "3931c054-8380-11e9-9ede-f367b00f4244", ct90 = "1"), by = "id_visita") %>% # was 90.1
-  rows_update(tibble(id_visita = "008a5ad4-8382-11e9-9ede-f367b00f4244", ct90 = "5"), by = "id_visita") %>% # was 90.5
-  rows_update(tibble(id_visita = "9158e8d6-dc44-11e8-87ef-efc75e1e34cc", paco2 = "41"), by = "id_visita") %>% # was 4
+  ) |>
+  rows_delete(tibble(id_visita = "a5c3cdf0-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") |> # study artifact
+  rows_delete(tibble(id_visita = "a9960e16-446f-11eb-b9c9-7dad0511d4f2"), by = "id_visita") |> # study artifact
+  rows_update(tibble(id_visita = "c2049bdf-4a91-43e0-b6c4-f770881b7499", fecha_visita = NA), by = "id_visita") |> # was 99-99-9999
+  rows_update(tibble(id_visita = "a3608f72-82eb-11e9-aed7-57f320d0dba4", fecha_realizacion_polisomnografia = NA), by = "id_visita") |> # was 14
+  rows_update(tibble(id_visita = "f508e4b8-db93-11e9-b372-090a91bd3693", fecha_realizacion_polisomnografia = NA), by = "id_visita") |> # was 14
+  rows_update(tibble(id_visita = "31f94d2a-fb08-11e9-b780-81f732616a71", odi3 = NA), by = "id_visita") |> # was 17/7
+  rows_update(tibble(id_visita = "a0a869b6-526b-44f3-9137-044c30b29551", fvc_estirado_absoluto = "2450"), by = "id_visita") |> # was 24500
+  rows_update(tibble(id_visita = "1915a65d-ecd0-4390-b60f-a87ea269898d", ct90 = NA, sao2_media = NA), by = "id_visita") |> # multiple errors
+  rows_update(tibble(id_visita = "0a668c6e-89ee-11e8-8428-29c4852a0217", hco3 = "33"), by = "id_visita") |> # was 3
+  rows_update(tibble(id_visita = "172665b8-47b4-11e8-915c-1db1c3288c02", fvc_sentado_absoluto = "920", fvc_estirado_absoluto = "920"), by = "id_visita") |> # both were 9100
+  rows_update(tibble(id_visita = "2786aece-9a1e-11e8-9eb2-af099be7b978", ct90 = "6"), by = "id_visita") |> # was 99.7
+  rows_update(tibble(id_visita = "3f94f6b5-0478-413c-96a4-86607e149447", pao2 = "102", paco2 = "32", hco3 = "21"), by = "id_visita") |> # values were flipped or missing
+  rows_update(tibble(id_visita = "7ee47f8a-bdf0-4db2-88b2-5f1d2ac28061", ct90 = "0.8", sao2_media = "95.98"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "7dcc96e9-7c4d-4535-a069-916574678a2c", ph_sangre_arterial = "7.46", hco3 = "27"), by = "id_visita") |> # values were missing
+  rows_update(tibble(id_visita = "613d31ec-fd2f-42c2-8ef8-fb90b0704bea", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") |> # abg not performed
+  rows_update(tibble(id_visita = "e8d20b44-9d34-4f8a-b076-2c1eb51473fc", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") |> # abg not performed
+  rows_update(tibble(id_visita = "7dd109f6-ce38-11e9-8beb-d1a9b58e35a5", fvc_estirado = "89"), by = "id_visita") |>
+  rows_update(tibble(id_visita = "f8ed6057-1f8f-4364-b39d-af298e032b8d", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") |> # abg not performed
+  rows_update(tibble(id_visita = "41b51e5e-ce28-11e9-8beb-d1a9b58e35a5", pim = "18"), by = "id_visita") |> # was 218
+  rows_update(tibble(id_visita = "1d3044ed-6c4b-4c87-9a8f-522c92e4bbe4", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") |> # abg not performed
+  rows_update(tibble(id_visita = "ef41001c-8e86-4d5f-a340-cec5d0291c53", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") |> # abg not performed
+  rows_update(tibble(id_visita = "66462823-8dfd-4654-a9ef-2200c618b13f", ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA), by = "id_visita") |> # abg not performed
+  rows_update(tibble(id_visita = "e45cdc18-1da2-11ea-a82e-af00877d97ef", fvc_sentado_absoluto = "4120"), by = "id_visita") |> # was 41200
+  rows_update(tibble(id_visita = "38156092-e761-11e8-807a-7b0007981048", hco3 = "26"), by = "id_visita") |> # was 2
+  rows_update(tibble(id_visita = "5ebd2a1e-4945-11e8-a423-f10b658f4c3d", ct90 = "6"), by = "id_visita") |> # was 90.6
+  rows_update(tibble(id_visita = "2e051a84-837e-11e9-9ede-f367b00f4244", ct90 = "3"), by = "id_visita") |> # was 90.3
+  rows_update(tibble(id_visita = "f53b17fe-837c-11e9-9ede-f367b00f4244", ct90 = "0"), by = "id_visita") |> # was 90.0
+  rows_update(tibble(id_visita = "3931c054-8380-11e9-9ede-f367b00f4244", ct90 = "1"), by = "id_visita") |> # was 90.1
+  rows_update(tibble(id_visita = "008a5ad4-8382-11e9-9ede-f367b00f4244", ct90 = "5"), by = "id_visita") |> # was 90.5
+  rows_update(tibble(id_visita = "9158e8d6-dc44-11e8-87ef-efc75e1e34cc", paco2 = "41"), by = "id_visita") |> # was 4
   rows_update(tibble(
     id_visita = "3d3bfffa-3120-11e9-80d3-0938853a2539",
     ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, # abg not performed
     sao2_media = "91", ct90 = "24", odi3 = "10" # values were wrong
-  ), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "acef89f8-47c8-11e8-a7d0-b52d1edb9069", pao2 = "109", paco2 = "36"), by = "id_visita") %>% # values were wrong
-  rows_update(tibble(id_visita = "56e5a8d0-2acb-11e9-8d8b-6bd4a449ee38", pao2 = "93", paco2 = "34"), by = "id_visita") %>% # values were wrong
-  rows_update(tibble(id_visita = "afa0cef0-2acb-11e9-8d8b-6bd4a449ee38", pao2 = "92", paco2 = "36"), by = "id_visita") %>% # values were wrong
-  rows_update(tibble(id_visita = "052f693e-0605-11ea-89b0-17e7b5a20645", sao2_media = "93", ct90 = "3"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "03bb7c9e-838a-11e9-9ede-f367b00f4244", pao2 = "81", paco2 = "43"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "cc79f9d2-52c9-11e8-880e-7fe41889cc89", fvc_sentado = "39", fvc_sentado_absoluto = "1420"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "ec7f50e6-1dca-11eb-bb4a-9745fc970131", ct90 = "95.8"), by = "id_visita") %>% # was 98.8
-  rows_update(tibble(id_visita = "943071c6-ea12-11eb-8de9-5ff3128bc34d", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # values were from previous npo
-  rows_update(tibble(id_visita = "77223818-305f-11e9-9393-2b87c41589f5", pao2 = "90", paco2 = "34"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "7eeb125e-89bb-11e8-9a8f-6ba51261727f", hco3 = "31"), by = "id_visita") %>% # was 3
-  rows_update(tibble(id_visita = "d3b5bcf8-5dc9-11e8-9ce8-cf38f9497e56", pao2 = "73", paco2 = "41", hco3 = "27"), by = "id_visita") %>% # pao2/paco2 values were flipped, hco3 was missing
-  rows_update(tibble(id_visita = "fe6dd472-d095-11e9-961d-d3f87ec1e7e1", ph_sangre_arterial = "7.43", pao2 = "85", paco2 = "45"), by = "id_visita") %>% # pao2/paco2 values were flipped, hco3 was missing
-  rows_update(tibble(id_visita = "d9ecbe46-0a99-11e9-9997-9759725d7b76", ph_sangre_arterial = "7.47", pao2 = "101", paco2 = "42", hco3 = "31"), by = "id_visita") %>% # values were wrong
-  rows_update(tibble(id_visita = "35dc5b76-0a9a-11e9-9997-9759725d7b76", hco3 = "29"), by = "id_visita") %>% # was 2
+  ), by = "id_visita") |>
+  rows_update(tibble(id_visita = "acef89f8-47c8-11e8-a7d0-b52d1edb9069", pao2 = "109", paco2 = "36"), by = "id_visita") |> # values were wrong
+  rows_update(tibble(id_visita = "56e5a8d0-2acb-11e9-8d8b-6bd4a449ee38", pao2 = "93", paco2 = "34"), by = "id_visita") |> # values were wrong
+  rows_update(tibble(id_visita = "afa0cef0-2acb-11e9-8d8b-6bd4a449ee38", pao2 = "92", paco2 = "36"), by = "id_visita") |> # values were wrong
+  rows_update(tibble(id_visita = "052f693e-0605-11ea-89b0-17e7b5a20645", sao2_media = "93", ct90 = "3"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "03bb7c9e-838a-11e9-9ede-f367b00f4244", pao2 = "81", paco2 = "43"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "cc79f9d2-52c9-11e8-880e-7fe41889cc89", fvc_sentado = "39", fvc_sentado_absoluto = "1420"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "ec7f50e6-1dca-11eb-bb4a-9745fc970131", ct90 = "95.8"), by = "id_visita") |> # was 98.8
+  rows_update(tibble(id_visita = "943071c6-ea12-11eb-8de9-5ff3128bc34d", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") |> # values were from previous npo
+  rows_update(tibble(id_visita = "77223818-305f-11e9-9393-2b87c41589f5", pao2 = "90", paco2 = "34"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "7eeb125e-89bb-11e8-9a8f-6ba51261727f", hco3 = "31"), by = "id_visita") |> # was 3
+  rows_update(tibble(id_visita = "d3b5bcf8-5dc9-11e8-9ce8-cf38f9497e56", pao2 = "73", paco2 = "41", hco3 = "27"), by = "id_visita") |> # pao2/paco2 values were flipped, hco3 was missing
+  rows_update(tibble(id_visita = "fe6dd472-d095-11e9-961d-d3f87ec1e7e1", ph_sangre_arterial = "7.43", pao2 = "85", paco2 = "45"), by = "id_visita") |> # pao2/paco2 values were flipped, hco3 was missing
+  rows_update(tibble(id_visita = "d9ecbe46-0a99-11e9-9997-9759725d7b76", ph_sangre_arterial = "7.47", pao2 = "101", paco2 = "42", hco3 = "31"), by = "id_visita") |> # values were wrong
+  rows_update(tibble(id_visita = "35dc5b76-0a9a-11e9-9997-9759725d7b76", hco3 = "29"), by = "id_visita") |> # was 2
   rows_update(tibble(
     id_visita = "9c2051c6-0a9a-11e9-9997-9759725d7b76",
     pao2 = NA, paco2 = NA, hco3 = NA, # abg not performed
     sao2_media = "94.8", ct90 = "0.8", odi3 = "7" # values were flipped
-  ), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "72cb1a14-12a4-11ea-badc-8b5db01dc70c", sao2_media = "92", ct90 = "17", odi3 = "27"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "c7fb0ae6-e06f-11ea-87ad-6151be442ee5", sao2_media = "93"), by = "id_visita") %>% # was 963
-  rows_update(tibble(id_visita = "92575848-fafd-11e9-b780-81f732616a71", hco3 = "29"), by = "id_visita") %>% # was 47
-  rows_update(tibble(id_visita = "cf16f606-b672-11e8-9abc-77a17ade9338", pao2 = "103", paco2 = "38", hco3 = "24"), by = "id_visita") %>% # pao2/paco2 were flipped, hco3 was missing
-  rows_update(tibble(id_visita = "6ed7a648-b675-11e8-9abc-77a17ade9338", ct90 = "0.96"), by = "id_visita") %>% # was 93
-  rows_update(tibble(id_visita = "a61a432c-ecdf-11e8-9848-4918586d805c", ct90 = "11"), by = "id_visita") %>% # was 171
-  rows_update(tibble(id_visita = "57ddc50c-ece0-11e8-9848-4918586d805c", hco3 = "24"), by = "id_visita") %>% # was 247
-  rows_update(tibble(id_visita = "20405d4a-fb07-11e9-b780-81f732616a71", pcf = "350", pns = NA), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "e18a485c-a5f5-11e8-b217-99d3df7458ce", sao2_media = "93.8", ct90 = "0.21"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "6112d056-883d-11e9-a996-85cf5f8a7da8", fvc_estirado = "86"), by = "id_visita") %>% # was 400
-  rows_update(tibble(id_visita = "f4c4b0b8-81be-11eb-bdaf-35917006ea01", ct90 = NA, sao2_media = NA), by = "id_visita") %>% # not performed
+  ), by = "id_visita") |>
+  rows_update(tibble(id_visita = "72cb1a14-12a4-11ea-badc-8b5db01dc70c", sao2_media = "92", ct90 = "17", odi3 = "27"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "c7fb0ae6-e06f-11ea-87ad-6151be442ee5", sao2_media = "93"), by = "id_visita") |> # was 963
+  rows_update(tibble(id_visita = "92575848-fafd-11e9-b780-81f732616a71", hco3 = "29"), by = "id_visita") |> # was 47
+  rows_update(tibble(id_visita = "cf16f606-b672-11e8-9abc-77a17ade9338", pao2 = "103", paco2 = "38", hco3 = "24"), by = "id_visita") |> # pao2/paco2 were flipped, hco3 was missing
+  rows_update(tibble(id_visita = "6ed7a648-b675-11e8-9abc-77a17ade9338", ct90 = "0.96"), by = "id_visita") |> # was 93
+  rows_update(tibble(id_visita = "a61a432c-ecdf-11e8-9848-4918586d805c", ct90 = "11"), by = "id_visita") |> # was 171
+  rows_update(tibble(id_visita = "57ddc50c-ece0-11e8-9848-4918586d805c", hco3 = "24"), by = "id_visita") |> # was 247
+  rows_update(tibble(id_visita = "20405d4a-fb07-11e9-b780-81f732616a71", pcf = "350", pns = NA), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "e18a485c-a5f5-11e8-b217-99d3df7458ce", sao2_media = "93.8", ct90 = "0.21"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "6112d056-883d-11e9-a996-85cf5f8a7da8", fvc_estirado = "86"), by = "id_visita") |> # was 400
+  rows_update(tibble(id_visita = "f4c4b0b8-81be-11eb-bdaf-35917006ea01", ct90 = NA, sao2_media = NA), by = "id_visita") |> # not performed
   rows_update(tibble(
     id_visita = "62ee3b20-68ce-11e8-8bba-011ae3e18648",
     ph_sangre_arterial = NA, sao2_media = "95.35", # values were flipped
     ct90 = "3.17", odi3 = "10", # values were missing
     pao2 = NA, paco2 = NA, hco3 = NA # abg not performed
-  ), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "921815ee-eb6f-11ea-8eab-918bb380203d", fvc_sentado_absoluto = "3310"), by = "id_visita") %>% # was 33310
-  rows_update(tibble(id_visita = "4308f4ec-d272-11eb-b08c-851f5b5d129e", fvc_sentado_absoluto = "5420"), by = "id_visita") %>% # was 54200
-  rows_update(tibble(id_visita = "d2755b2a-91b0-11e9-8658-35a5d3539e15", hco3 = "30", paco2 = "41"), by = "id_visita") %>% # wrong values
-  rows_update(tibble(id_visita = "f1e2bc96-fef7-11e9-b2bc-2bd7e660e45b", hco3 = "23"), by = "id_visita") %>% # was 213
-  rows_update(tibble(id_visita = "ccf8c196-22e4-11e8-bd92-937d2f7100b4", ct90 = NA), by = "id_visita") %>% # contained sao2_media
-  rows_update(tibble(id_visita = "c5a16d28-1332-11e9-8be2-e38b9cc14280", pao2 = "81", paco2 = "42"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "70746d6c-9a35-11e8-b94f-4f39f1d733d1", hco3 = "27"), by = "id_visita") %>% # was 72
-  rows_update(tibble(id_visita = "cdc2459c-9a36-11e8-b94f-4f39f1d733d1", pim = "86"), by = "id_visita") %>% # was 183
-  rows_update(tibble(id_visita = "09d93355-45d1-11eb-ab70-71abb58c311a", pim = NA, pem = NA), by = "id_visita") %>% # data not found
-  rows_update(tibble(id_visita = "12d3a6e0-138d-11eb-a114-cddc6e0437ad", ct90 = "1.8"), by = "id_visita") %>% # was 138
-  rows_update(tibble(id_visita = "ab8aaa2a-53f5-11eb-a974-9774facb76d4", ct90 = "0"), by = "id_visita") %>% # was 90
-  rows_update(tibble(id_visita = "b10e0910-f347-11ea-9794-a9e1a185db06", ct90 = "0"), by = "id_visita") %>% # was 90
-  rows_update(tibble(id_visita = "62b28c1a-7099-11e8-bffa-fbbf07f4b8c5", pao2 = "94", paco2 = "39"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "20b0cd86-e695-11e9-9a0f-0fdab8b37fe7", pao2 = NA, paco2 = NA), by = "id_visita") %>% # data not found
-  rows_update(tibble(id_visita = "b31ada4e-838b-11e9-9ede-f367b00f4244", pao2 = "127", paco2 = "40"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "7f99fe5c-e073-11ea-87ad-6151be442ee5", sao2_media = "93.2", ct90 = "0.8"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "f996787c-aad1-4e66-8335-3964ca55aa7d", pns = NA, pcf = "440"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "3cc517ba-311f-11e9-80d3-0938853a2539", pns = NA, pcf = "185"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "e83a3ad6-b667-11e8-9abc-77a17ade9338", pns = NA, pcf = "450"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "cfbdc066-05fa-11ea-89b0-17e7b5a20645", ct90 = "3.8"), by = "id_visita") %>% # was 90.3
-  rows_update(tibble(id_visita = "9b4ef030-cee2-11e7-8d7f-c9c4ce89f9c5", ct90 = "0"), by = "id_visita") %>% # was 90
-  rows_update(tibble(id_visita = "a5e3dcc4-d707-11ea-bb6b-31ec986d6c42", ct90 = "0"), by = "id_visita") %>% # was 90
-  rows_update(tibble(id_visita = "14c6782e-d5ce-11ec-ab47-f14c5265e448", ct90 = "0.6", sao2_media = "95.8", odi3 = "8"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "a74f9472-c3dc-11e7-b405-7fa326ba76f2", odi3 = "5", ct90 = "1", sao2_media = "93"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "16f87e1c-d7ce-11ea-8786-6f85542dc338", odi3 = "5.8", sao2_media = "94.27", ct90 = "0.26"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "ae050874-8c49-11e9-8c23-a5c3d8474f8f", pao2 = "97", paco2 = "42"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "6913089e-ee98-11ea-aa63-851e06783497", pao2 = "110", paco2 = "39"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "79d5c1ea-4450-11eb-82b7-377ffbad2e56", paco2 = "46", hco3 = "28"), by = "id_visita") %>% # paco2 contained pao2, hco3 was missing
-  rows_update(tibble(id_visita = "cd4ba262-2554-11e9-9820-09ea91f975fa", pao2 = "109", paco2 = "36"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "6e20d426-6333-11e8-8914-9b10f80dedd0", pao2 = "97", paco2 = "41"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "b7b20a44-e782-11ea-ba91-5d9fa569562f", ph_sangre_arterial = "7.44"), by = "id_visita") %>% # was 744
+  ), by = "id_visita") |>
+  rows_update(tibble(id_visita = "921815ee-eb6f-11ea-8eab-918bb380203d", fvc_sentado_absoluto = "3310"), by = "id_visita") |> # was 33310
+  rows_update(tibble(id_visita = "4308f4ec-d272-11eb-b08c-851f5b5d129e", fvc_sentado_absoluto = "5420"), by = "id_visita") |> # was 54200
+  rows_update(tibble(id_visita = "d2755b2a-91b0-11e9-8658-35a5d3539e15", hco3 = "30", paco2 = "41"), by = "id_visita") |> # wrong values
+  rows_update(tibble(id_visita = "f1e2bc96-fef7-11e9-b2bc-2bd7e660e45b", hco3 = "23"), by = "id_visita") |> # was 213
+  rows_update(tibble(id_visita = "ccf8c196-22e4-11e8-bd92-937d2f7100b4", ct90 = NA), by = "id_visita") |> # contained sao2_media
+  rows_update(tibble(id_visita = "c5a16d28-1332-11e9-8be2-e38b9cc14280", pao2 = "81", paco2 = "42"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "70746d6c-9a35-11e8-b94f-4f39f1d733d1", hco3 = "27"), by = "id_visita") |> # was 72
+  rows_update(tibble(id_visita = "cdc2459c-9a36-11e8-b94f-4f39f1d733d1", pim = "86"), by = "id_visita") |> # was 183
+  rows_update(tibble(id_visita = "09d93355-45d1-11eb-ab70-71abb58c311a", pim = NA, pem = NA), by = "id_visita") |> # data not found
+  rows_update(tibble(id_visita = "12d3a6e0-138d-11eb-a114-cddc6e0437ad", ct90 = "1.8"), by = "id_visita") |> # was 138
+  rows_update(tibble(id_visita = "ab8aaa2a-53f5-11eb-a974-9774facb76d4", ct90 = "0"), by = "id_visita") |> # was 90
+  rows_update(tibble(id_visita = "b10e0910-f347-11ea-9794-a9e1a185db06", ct90 = "0"), by = "id_visita") |> # was 90
+  rows_update(tibble(id_visita = "62b28c1a-7099-11e8-bffa-fbbf07f4b8c5", pao2 = "94", paco2 = "39"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "20b0cd86-e695-11e9-9a0f-0fdab8b37fe7", pao2 = NA, paco2 = NA), by = "id_visita") |> # data not found
+  rows_update(tibble(id_visita = "b31ada4e-838b-11e9-9ede-f367b00f4244", pao2 = "127", paco2 = "40"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "7f99fe5c-e073-11ea-87ad-6151be442ee5", sao2_media = "93.2", ct90 = "0.8"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "f996787c-aad1-4e66-8335-3964ca55aa7d", pns = NA, pcf = "440"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "3cc517ba-311f-11e9-80d3-0938853a2539", pns = NA, pcf = "185"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "e83a3ad6-b667-11e8-9abc-77a17ade9338", pns = NA, pcf = "450"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "cfbdc066-05fa-11ea-89b0-17e7b5a20645", ct90 = "3.8"), by = "id_visita") |> # was 90.3
+  rows_update(tibble(id_visita = "9b4ef030-cee2-11e7-8d7f-c9c4ce89f9c5", ct90 = "0"), by = "id_visita") |> # was 90
+  rows_update(tibble(id_visita = "a5e3dcc4-d707-11ea-bb6b-31ec986d6c42", ct90 = "0"), by = "id_visita") |> # was 90
+  rows_update(tibble(id_visita = "14c6782e-d5ce-11ec-ab47-f14c5265e448", ct90 = "0.6", sao2_media = "95.8", odi3 = "8"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "a74f9472-c3dc-11e7-b405-7fa326ba76f2", odi3 = "5", ct90 = "1", sao2_media = "93"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "16f87e1c-d7ce-11ea-8786-6f85542dc338", odi3 = "5.8", sao2_media = "94.27", ct90 = "0.26"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "ae050874-8c49-11e9-8c23-a5c3d8474f8f", pao2 = "97", paco2 = "42"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "6913089e-ee98-11ea-aa63-851e06783497", pao2 = "110", paco2 = "39"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "79d5c1ea-4450-11eb-82b7-377ffbad2e56", paco2 = "46", hco3 = "28"), by = "id_visita") |> # paco2 contained pao2, hco3 was missing
+  rows_update(tibble(id_visita = "cd4ba262-2554-11e9-9820-09ea91f975fa", pao2 = "109", paco2 = "36"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "6e20d426-6333-11e8-8914-9b10f80dedd0", pao2 = "97", paco2 = "41"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "b7b20a44-e782-11ea-ba91-5d9fa569562f", ph_sangre_arterial = "7.44"), by = "id_visita") |> # was 744
   rows_update(tibble(
     id_visita = "91cad63e-df08-11eb-876d-61d8cc6ff0fe",
     fvc_sentado = "103", # fvc_sentado contained FEV1
     fvc_sentado_absoluto = "5040", # fvc_sentado_abs contained fvc_sentado
     pcf = NA # pcf contained fvc_sentado_abs
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "2ef0705c-2fe3-11eb-a414-cdc7c2599e4f",
     fvc_sentado = "98", # fvc_sentado contained absolute FEV1
@@ -499,93 +497,93 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") %>%
     fvc_estirado = NA, # fvc_estirado was missing
     fvc_estirado_absoluto = NA, # fvc_estirado_abs contained %FEV1
     pcf = NA, # pcf contained fvc_sentado_abs
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "92553af8-5dcf-11e8-9ce8-cf38f9497e56",
     pao2 = "94", paco2 = "35", # values were flipped
     hco3 = "22" # was missing
-  ), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "f493676c-ecf7-11ea-9b9d-9d9bdb02a59a", pao2 = "104", paco2 = "40"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "0b34cdbc-0f9e-11eb-9cdd-5b494bd8f088", paco2 = "37"), by = "id_visita") %>% # contained pao2
-  rows_update(tibble(id_visita = "2617105e-221b-11ed-9e37-37dec3ae1adb", sao2_media = "91.78"), by = "id_visita") %>% # was 9178
-  rows_update(tibble(id_visita = "20ce0a56-3df9-11eb-9383-d3a3b2195eff", pns = "64", pcf = "300"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "56cef280-12c2-11eb-bc61-6193a81164b0", pao2 = "101", paco2 = "43"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "3681751c-fb7c-11ec-9f93-8170d5a8e848", paco2 = "37"), by = "id_visita") %>% # was 85
-  rows_update(tibble(id_visita = "97728d44-838d-11e9-9ede-f367b00f4244", pao2 = "108"), by = "id_visita") %>% # was 47108
+  ), by = "id_visita") |>
+  rows_update(tibble(id_visita = "f493676c-ecf7-11ea-9b9d-9d9bdb02a59a", pao2 = "104", paco2 = "40"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "0b34cdbc-0f9e-11eb-9cdd-5b494bd8f088", paco2 = "37"), by = "id_visita") |> # contained pao2
+  rows_update(tibble(id_visita = "2617105e-221b-11ed-9e37-37dec3ae1adb", sao2_media = "91.78"), by = "id_visita") |> # was 9178
+  rows_update(tibble(id_visita = "20ce0a56-3df9-11eb-9383-d3a3b2195eff", pns = "64", pcf = "300"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "56cef280-12c2-11eb-bc61-6193a81164b0", pao2 = "101", paco2 = "43"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "3681751c-fb7c-11ec-9f93-8170d5a8e848", paco2 = "37"), by = "id_visita") |> # was 85
+  rows_update(tibble(id_visita = "97728d44-838d-11e9-9ede-f367b00f4244", pao2 = "108"), by = "id_visita") |> # was 47108
   rows_update(tibble(
     id_visita = "f3caa9f2-e4db-11e7-8222-4fcf3b7eb7b9",
     ph_sangre_arterial = "7.43", # was 96.2
     pao2 = "98", # contained paco2
     hco3 = "26" # was missing
-  ), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "91019da8-4a56-11e9-9f98-cd726d473012", ph_sangre_arterial = "7.45"), by = "id_visita") %>% # was 45
-  rows_update(tibble(id_visita = "0c57cd06-d936-11e9-87ad-ad3b45e595ef", pns = "28", pcf = "300"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "2d03851a-1d78-4ff2-950c-4f1372f5aef0", pcf = NA), by = "id_visita") %>% # was 310-330-360 (PFR)
-  rows_update(tibble(id_visita = "c4d4d078-5dc1-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 200-180-230 (PFR)
-  rows_update(tibble(id_visita = "fc8ed9a8-5dc8-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 240-180-200 (PFR)
-  rows_update(tibble(id_visita = "10e3c698-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 180-180-190 (PFR)
-  rows_update(tibble(id_visita = "45551198-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 160-120-140 (PFR)
-  rows_update(tibble(id_visita = "578c75b8-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 130-180-120 (PFR)
-  rows_update(tibble(id_visita = "6e11d738-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 200-180-150 (PFR)
-  rows_update(tibble(id_visita = "82d11eb8-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") %>% # was 120-140-120 (PFR)
-  rows_update(tibble(id_visita = "5de4577e-0b11-11e8-ada5-c11bb16fd5d7", ph_sangre_arterial = "7.4"), by = "id_visita") %>% # was 7,40
-  rows_update(tibble(id_visita = "24ed97f8-3b4b-11e9-b6ec-151f525efe3b", pao2 = "90"), by = "id_visita") %>% # was 990
-  rows_update(tibble(id_visita = "4e552b10-4cb6-457d-b7d6-b62b0e42686a", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
-  rows_update(tibble(id_visita = "7c2daa33-0525-4778-8e26-75456d7ab259", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
-  rows_update(tibble(id_visita = "ddc0bd29-3363-4689-92e3-b4cf22f2230d", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
-  rows_update(tibble(id_visita = "7dd66ffe-dc36-48d3-9285-678c2de02291", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
-  rows_update(tibble(id_visita = "48dd2afc-302a-4b38-bd37-234022474a26", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") %>% # npo not performed
-  rows_update(tibble(id_visita = "1281f464-6471-11eb-91da-53f2dbb71c3f", sao2_media = "93.5", ct90 = "13"), by = "id_visita") %>% # wrong values
-  rows_update(tibble(id_visita = "4308f4ec-d272-11eb-b08c-851f5b5d129e", sao2_media = "93.3"), by = "id_visita") %>% # was 9.3
+  ), by = "id_visita") |>
+  rows_update(tibble(id_visita = "91019da8-4a56-11e9-9f98-cd726d473012", ph_sangre_arterial = "7.45"), by = "id_visita") |> # was 45
+  rows_update(tibble(id_visita = "0c57cd06-d936-11e9-87ad-ad3b45e595ef", pns = "28", pcf = "300"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "2d03851a-1d78-4ff2-950c-4f1372f5aef0", pcf = NA), by = "id_visita") |> # was 310-330-360 (PFR)
+  rows_update(tibble(id_visita = "c4d4d078-5dc1-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") |> # was 200-180-230 (PFR)
+  rows_update(tibble(id_visita = "fc8ed9a8-5dc8-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") |> # was 240-180-200 (PFR)
+  rows_update(tibble(id_visita = "10e3c698-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") |> # was 180-180-190 (PFR)
+  rows_update(tibble(id_visita = "45551198-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") |> # was 160-120-140 (PFR)
+  rows_update(tibble(id_visita = "578c75b8-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") |> # was 130-180-120 (PFR)
+  rows_update(tibble(id_visita = "6e11d738-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") |> # was 200-180-150 (PFR)
+  rows_update(tibble(id_visita = "82d11eb8-5dc9-11e8-9ce8-cf38f9497e56", pcf = NA), by = "id_visita") |> # was 120-140-120 (PFR)
+  rows_update(tibble(id_visita = "5de4577e-0b11-11e8-ada5-c11bb16fd5d7", ph_sangre_arterial = "7.4"), by = "id_visita") |> # was 7,40
+  rows_update(tibble(id_visita = "24ed97f8-3b4b-11e9-b6ec-151f525efe3b", pao2 = "90"), by = "id_visita") |> # was 990
+  rows_update(tibble(id_visita = "4e552b10-4cb6-457d-b7d6-b62b0e42686a", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") |> # npo not performed
+  rows_update(tibble(id_visita = "7c2daa33-0525-4778-8e26-75456d7ab259", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") |> # npo not performed
+  rows_update(tibble(id_visita = "ddc0bd29-3363-4689-92e3-b4cf22f2230d", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") |> # npo not performed
+  rows_update(tibble(id_visita = "7dd66ffe-dc36-48d3-9285-678c2de02291", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") |> # npo not performed
+  rows_update(tibble(id_visita = "48dd2afc-302a-4b38-bd37-234022474a26", sao2_media = NA, ct90 = NA, odi3 = NA), by = "id_visita") |> # npo not performed
+  rows_update(tibble(id_visita = "1281f464-6471-11eb-91da-53f2dbb71c3f", sao2_media = "93.5", ct90 = "13"), by = "id_visita") |> # wrong values
+  rows_update(tibble(id_visita = "4308f4ec-d272-11eb-b08c-851f5b5d129e", sao2_media = "93.3"), by = "id_visita") |> # was 9.3
   rows_update(tibble(
     id_visita = "9c2051c6-0a9a-11e9-9997-9759725d7b76",
     ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, # abg not performed
     sao2_media = "94.8", ct90 = "0.8", odi3 = "7" # npo values were missing
-  ), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "8c7ba494-3f97-11eb-975e-1bf97f2fdc83", pao2 = "103"), by = "id_visita") %>% # was 703
-  rows_update(tibble(id_visita = "63d362c4-d5d3-11ec-ab47-f14c5265e448", sao2_media = "94"), by = "id_visita") %>% # was 9
-  rows_update(tibble(id_visita = "ccf8c196-22e4-11e8-bd92-937d2f7100b4", odi3 = "10.6"), by = "id_visita") %>% # was 93 (% odi3)
-  rows_update(tibble(id_visita = "ffeaf23e-623f-11eb-9754-55d71760aef7", pao2 = "88", paco2 = "39"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "c41240dc-5c5b-11e9-8681-5b6191ee60f9", sao2_media = "94.3"), by = "id_visita") %>% # was 74.3
-  rows_update(tibble(id_visita = "71003c71-6b7f-4fc2-a83a-a44821e3621e", pao2 = NA, paco2 = NA), by = "id_visita") %>% # incomplete abg
-  rows_update(tibble(id_visita = "e0289aae-47b3-11e8-915c-1db1c3288c02", hco3 = "33"), by = "id_visita") %>% # was 3
-  rows_update(tibble(id_visita = "12751d79-dd06-498e-afd9-29ffaf60b1d3", paco2 = NA), by = "id_visita") %>% # technical issue
+  ), by = "id_visita") |>
+  rows_update(tibble(id_visita = "8c7ba494-3f97-11eb-975e-1bf97f2fdc83", pao2 = "103"), by = "id_visita") |> # was 703
+  rows_update(tibble(id_visita = "63d362c4-d5d3-11ec-ab47-f14c5265e448", sao2_media = "94"), by = "id_visita") |> # was 9
+  rows_update(tibble(id_visita = "ccf8c196-22e4-11e8-bd92-937d2f7100b4", odi3 = "10.6"), by = "id_visita") |> # was 93 (% odi3)
+  rows_update(tibble(id_visita = "ffeaf23e-623f-11eb-9754-55d71760aef7", pao2 = "88", paco2 = "39"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "c41240dc-5c5b-11e9-8681-5b6191ee60f9", sao2_media = "94.3"), by = "id_visita") |> # was 74.3
+  rows_update(tibble(id_visita = "71003c71-6b7f-4fc2-a83a-a44821e3621e", pao2 = NA, paco2 = NA), by = "id_visita") |> # incomplete abg
+  rows_update(tibble(id_visita = "e0289aae-47b3-11e8-915c-1db1c3288c02", hco3 = "33"), by = "id_visita") |> # was 3
+  rows_update(tibble(id_visita = "12751d79-dd06-498e-afd9-29ffaf60b1d3", paco2 = NA), by = "id_visita") |> # technical issue
   rows_update(tibble(
     id_visita = "706ffe1c-847b-11ea-845f-91a37060d068",
     ph_sangre_arterial = "7.33", pao2 = "78", paco2 = "60", hco3 = "35" # wrong values
-  ), by = "id_visita") %>%
-  rows_update(tibble(id_visita = "d0a1048e-e13c-11ea-96e9-e996c45a8003", pao2 = "98", hco3 = "19"), by = "id_visita") %>% # pao2 was 9, hco3 was missing
-  rows_update(tibble(id_visita = "d5bf94aa-b169-11eb-9be1-99c56818900c", sao2_media = "92.5"), by = "id_visita") %>% # was 82
-  rows_update(tibble(id_visita = "a3102824-202a-11eb-8053-a39cb1e6e4aa", pao2 = "111"), by = "id_visita") %>% # was 11
-  rows_update(tibble(id_visita = "f681649a-9a4a-11e8-a76b-393315964526", pao2 = "69", paco2 = "49"), by = "id_visita") %>% # values were flipped
-  rows_update(tibble(id_visita = "7d97e41e-fefd-11e9-b2bc-2bd7e660e45b", pao2 = "109"), by = "id_visita") %>% # was 19
-  rows_update(tibble(id_visita = "a87b7260-3ece-11eb-9cb0-9f6fd3cfe09e", pao2 = "80"), by = "id_visita") %>% # was 20
+  ), by = "id_visita") |>
+  rows_update(tibble(id_visita = "d0a1048e-e13c-11ea-96e9-e996c45a8003", pao2 = "98", hco3 = "19"), by = "id_visita") |> # pao2 was 9, hco3 was missing
+  rows_update(tibble(id_visita = "d5bf94aa-b169-11eb-9be1-99c56818900c", sao2_media = "92.5"), by = "id_visita") |> # was 82
+  rows_update(tibble(id_visita = "a3102824-202a-11eb-8053-a39cb1e6e4aa", pao2 = "111"), by = "id_visita") |> # was 11
+  rows_update(tibble(id_visita = "f681649a-9a4a-11e8-a76b-393315964526", pao2 = "69", paco2 = "49"), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "7d97e41e-fefd-11e9-b2bc-2bd7e660e45b", pao2 = "109"), by = "id_visita") |> # was 19
+  rows_update(tibble(id_visita = "a87b7260-3ece-11eb-9cb0-9f6fd3cfe09e", pao2 = "80"), by = "id_visita") |> # was 20
   rows_update(tibble(
     id_visita = "c6e2f65a-5cc0-11eb-b70c-0d37f12d66de",
     ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA
-  ), by = "id_visita") %>% # abg from patient hospitalization
-  rows_update(tibble(id_visita = "84c8850e-6345-11e8-8914-9b10f80dedd0", pao2 = "96"), by = "id_visita") %>% # was 38
+  ), by = "id_visita") |> # abg from patient hospitalization
+  rows_update(tibble(id_visita = "84c8850e-6345-11e8-8914-9b10f80dedd0", pao2 = "96"), by = "id_visita") |> # was 38
   rows_update(tibble(
     id_visita = "e909b338-452b-11eb-8233-33820674d089",
     ph_sangre_arterial = NA, pao2 = NA, paco2 = NA, hco3 = NA
-  ), by = "id_visita") %>% # abg not performed
-  rows_update(tibble(id_visita = "eb2f3d4c-1f59-11eb-b9a3-f574dce5bdba", pao2 = "103"), by = "id_visita") %>% # contained paco2
-  rows_update(tibble(id_visita = "cc7a960e-0f95-11eb-9cdd-5b494bd8f088", pao2 = "117"), by = "id_visita") %>% # contained paco2
+  ), by = "id_visita") |> # abg not performed
+  rows_update(tibble(id_visita = "eb2f3d4c-1f59-11eb-b9a3-f574dce5bdba", pao2 = "103"), by = "id_visita") |> # contained paco2
+  rows_update(tibble(id_visita = "cc7a960e-0f95-11eb-9cdd-5b494bd8f088", pao2 = "117"), by = "id_visita") |> # contained paco2
   rows_update(tibble(
     id_visita = "b99541cf-5266-4b62-b7fd-af8b247803e1",
     ph_sangre_arterial = "7.43", pao2 = "87", paco2 = "38", hco3 = "25"
-  ), by = "id_visita") %>% # values were wrong
+  ), by = "id_visita") |> # values were wrong
   rows_update(tibble(
     id_visita = "401a29a2-eaf2-47b7-aecf-ece888c64ec9",
     ph_sangre_arterial = "7.44", hco3 = "27"
-  ), by = "id_visita") %>% # values were missing
-  rows_update(tibble(id_visita = "7b6375dc-4380-11eb-aaf4-eb9c15baf06f", fecha_visita = "18-12-2020"), by = "id_visita") %>% # wrong date
-  rows_update(tibble(id_visita = "b84ee5f0-ee2c-11ec-a57d-b98b14e27f3f", fvc_sentado_absoluto = "1980"), by = "id_visita") %>% # was 7980
-  rows_update(tibble(id_visita = "3d614c76-48f5-11eb-b52b-1f59d77403aa", fvc_sentado_absoluto = "2790"), by = "id_visita") %>% # was 7890
+  ), by = "id_visita") |> # values were missing
+  rows_update(tibble(id_visita = "7b6375dc-4380-11eb-aaf4-eb9c15baf06f", fecha_visita = "18-12-2020"), by = "id_visita") |> # wrong date
+  rows_update(tibble(id_visita = "b84ee5f0-ee2c-11ec-a57d-b98b14e27f3f", fvc_sentado_absoluto = "1980"), by = "id_visita") |> # was 7980
+  rows_update(tibble(id_visita = "3d614c76-48f5-11eb-b52b-1f59d77403aa", fvc_sentado_absoluto = "2790"), by = "id_visita") |> # was 7890
   rows_update(tibble(
     id_visita = "d27161ca-b16e-11eb-9be1-99c56818900c",
     fvc_sentado = "155", fvc_sentado_absoluto = "4160"
-  ), by = "id_visita") %>% # values were flipped
+  ), by = "id_visita") |> # values were flipped
   mutate(
     across(!c(ends_with("_cual"), cumplimiento_cpap), \(x) ufmn_parse_na(x, na_empty = TRUE)),
     across(starts_with("fecha"), ufmn_parse_date),
@@ -612,58 +610,58 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") %>%
       pao2, paco2, hco3, sao2_media, ct90, odi3, ct90_polisomnografia, iah,
       fvc_sentado_absoluto, fvc_estirado_absoluto
     ), parse_number)
-  ) %>%
-  select(!c(created_datetime:updated_datetime)) %>%
+  ) |>
+  select(!c(created_datetime:updated_datetime)) |>
   arrange(id_paciente, fecha_visita)
 
-ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
+ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") |>
   rename(
     id_visita = id,
     id_paciente = pid,
     fecha_visita = fecha_visita_esc_val_ela,
     insuf_resp = insuficiencia_respiratoria,
     kings_r = kings
-  ) %>%
-  rows_reset(tibble(id_visita = "c762bfca-df50-11e7-913f-898db1444b28"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "7824e0ae-0b1b-11e8-ada5-c11bb16fd5d7"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "d950b7be-be53-11e7-854b-69bf7a307972"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "52a010f0-0b53-11e8-a739-3927728b190b"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "c490d08e-22e4-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "b98eb8de-0b12-11e8-ada5-c11bb16fd5d7"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "31775b3a-df53-11e7-913f-898db1444b28"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "3290366e-0b17-11e8-ada5-c11bb16fd5d7"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "482ed0f2-22e6-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "1e1b0230-bfaf-11e7-8973-f909c4af69c9"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "7b222648-e4d0-11e7-8222-4fcf3b7eb7b9"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "d48b24a2-e0cd-11e7-a41d-951fbf0a64ef"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "6216659c-4431-11eb-8819-1948421e8c8d"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "081ccd70-3c08-11e9-bacb-89acb4d69104"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "1142f7a0-8f63-11e8-90a3-ff2b0bfabaa2"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "277837de-208a-11e9-9341-45e3ce47fe90"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "664c7d1e-ee90-11ea-aa63-851e06783497"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "9e46525a-b305-11eb-96a7-27cdb1c6efb1"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "f877112a-59b2-11ec-97be-b1dc88f020df"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "7d33fa84-edbe-11ea-b1c3-e5404a292065"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "0418da4a-df50-11e7-913f-898db1444b28"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "40573a56-22e4-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "a0a3bff2-e2cb-11ea-b03f-a7e8f227e03a"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "66532790-be5f-11e7-854b-69bf7a307972"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "6ce47da4-d99c-11e7-b681-6585f92f3d5c"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "5f4bc604-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "8025974c-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "89d6f9ac-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "c3c10f66-bfca-11e7-af09-51e9d3377771"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "f5997e1c-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "8356b516-3df3-11eb-9383-d3a3b2195eff"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "c0792408-2b4d-11e8-a24c-e9b93d7ec40a"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "2b5c8a1c-1d70-11e8-824e-4f42ed25e7a5"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "31acd35a-22e2-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "da5aa432-22e2-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "5e969c7e-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
-  rows_reset(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") %>%
+  ) |>
+  rows_reset(tibble(id_visita = "c762bfca-df50-11e7-913f-898db1444b28"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "7824e0ae-0b1b-11e8-ada5-c11bb16fd5d7"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "d950b7be-be53-11e7-854b-69bf7a307972"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "52a010f0-0b53-11e8-a739-3927728b190b"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "c490d08e-22e4-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "b98eb8de-0b12-11e8-ada5-c11bb16fd5d7"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "31775b3a-df53-11e7-913f-898db1444b28"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "3290366e-0b17-11e8-ada5-c11bb16fd5d7"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "482ed0f2-22e6-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "1e1b0230-bfaf-11e7-8973-f909c4af69c9"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "7b222648-e4d0-11e7-8222-4fcf3b7eb7b9"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "d48b24a2-e0cd-11e7-a41d-951fbf0a64ef"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "6216659c-4431-11eb-8819-1948421e8c8d"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "081ccd70-3c08-11e9-bacb-89acb4d69104"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "1142f7a0-8f63-11e8-90a3-ff2b0bfabaa2"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "277837de-208a-11e9-9341-45e3ce47fe90"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "664c7d1e-ee90-11ea-aa63-851e06783497"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "9e46525a-b305-11eb-96a7-27cdb1c6efb1"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "f877112a-59b2-11ec-97be-b1dc88f020df"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "7d33fa84-edbe-11ea-b1c3-e5404a292065"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "0418da4a-df50-11e7-913f-898db1444b28"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "40573a56-22e4-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "a0a3bff2-e2cb-11ea-b03f-a7e8f227e03a"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "66532790-be5f-11e7-854b-69bf7a307972"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "6ce47da4-d99c-11e7-b681-6585f92f3d5c"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "5f4bc604-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "8025974c-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "89d6f9ac-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "c3c10f66-bfca-11e7-af09-51e9d3377771"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "f5997e1c-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "8356b516-3df3-11eb-9383-d3a3b2195eff"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "c0792408-2b4d-11e8-a24c-e9b93d7ec40a"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "2b5c8a1c-1d70-11e8-824e-4f42ed25e7a5"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "31acd35a-22e2-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "da5aa432-22e2-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "5e969c7e-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
+  rows_reset(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "3318ad62-e4db-11e7-8222-4fcf3b7eb7b9",
     # ALSFRS 4-4-4-2-1-2-3-3-3-4-4-4
@@ -671,7 +669,7 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     escritura = "2", cortar_con_peg = "1", cortar_sin_peg = "1", vestido = "2",
     cama = "3", caminar = "3", subir_escaleras = "3",
     disnea = "4", ortopnea = "4", insuf_resp = "4"
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "930344b6-9a30-11e8-9eb2-af099be7b978",
     # ALSFRS 3-3-3-come sola-corta con ayuda-se vista y asea sola lenta-anda con ayuda-
@@ -680,7 +678,7 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     escritura = NA, cortar_con_peg = NA, cortar_sin_peg = "4", vestido = "3",
     cama = NA, caminar = "2", subir_escaleras = "1",
     disnea = "1", ortopnea = "4", insuf_resp = "4"
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "14a1b498-ce8c-11eb-afd7-ed6fcecd9429",
     # ALSFRS 4-4-4-4-4-4-4-2-1-4-4-4
@@ -688,7 +686,7 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     escritura = "4", cortar_con_peg = "4", cortar_sin_peg = "4", vestido = "4",
     cama = "4", caminar = "2", subir_escaleras = "1",
     disnea = "4", ortopnea = "4", insuf_resp = "4"
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "bdbd9d42-98c1-11e9-9feb-8dcf40d9fa45",
     # ALSFRS 0-3-1-2-1-2-3-2-1-4-4-4
@@ -696,7 +694,7 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     escritura = "2", cortar_con_peg = "1", cortar_sin_peg = "1", vestido = "2",
     cama = "3", caminar = "2", subir_escaleras = "1",
     disnea = "4", ortopnea = "4", insuf_resp = "4"
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "c39cd9ec-12a3-11ea-badc-8b5db01dc70c",
     # ALSFRS 0-3-1-2-1-2-3-2-1-2-0-0
@@ -704,7 +702,7 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     escritura = "2", cortar_con_peg = "1", cortar_sin_peg = "1", vestido = "2",
     cama = "3", caminar = "2", subir_escaleras = "1",
     disnea = "2", ortopnea = "0", insuf_resp = "0"
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "796374aa-ee9c-11ea-aa63-851e06783497",
     # ALSFRS 4-4-4-2-0-0-0-0-0-3-4-2
@@ -712,16 +710,7 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     escritura = "2", cortar_con_peg = "0", cortar_sin_peg = "0", vestido = "0",
     cama = "0", caminar = "0", subir_escaleras = "0",
     disnea = "3", ortopnea = "4", insuf_resp = "2"
-  ), by = "id_visita") %>%
-  rows_update(tibble(
-    id_visita = "1a485a74-df68-11e9-9c30-274ab37b3217",
-    # ALSFRS: habla 3, salivacion 3, deglucion 3, comer 0, escribir 0, higiene 0,
-    # girarse cama 0, deambular 0, escaleras 0, no disnea ni ortopnea pero VMNI nocturna
-    lenguaje = "3", salivacion = "3", deglucion = "3",
-    escritura = "0", cortar_con_peg = "0", cortar_sin_peg = "0", vestido = "0",
-    cama = "0", caminar = "0", subir_escaleras = "0",
-    disnea = "0", ortopnea = "0", insuf_resp = "2"
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "0aded8ac-4eaa-11ec-886f-6f0859135454",
     # ALSFRS 3-3-3-0-0-0-1-0-0-2-0-4
@@ -729,7 +718,7 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     escritura = "0", cortar_con_peg = "0", cortar_sin_peg = "0", vestido = "0",
     cama = "1", caminar = "0", subir_escaleras = "0",
     disnea = "2", ortopnea = "0", insuf_resp = "4"
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "cfd1d762-52c9-11e8-880e-7fe41889cc89",
     # ALSFRS 4-4-3-3-3-2-3-2-1-0-0-1
@@ -737,7 +726,7 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     escritura = "3", cortar_con_peg = "3", cortar_sin_peg = "3", vestido = "2",
     cama = "3", caminar = "2", subir_escaleras = "1",
     disnea = "0", ortopnea = "0", insuf_resp = "1"
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "1a485a74-df68-11e9-9c30-274ab37b3217",
     # ALSFRS habla 3, salivacion 3, deglucion 3, comer 0, escribir 0, higiene 0,
@@ -746,13 +735,40 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") %>%
     escritura = "0", cortar_con_peg = "0", cortar_sin_peg = "0", vestido = "0",
     cama = "0", caminar = "0", subir_escaleras = "0",
     disnea = "0", ortopnea = "0", insuf_resp = "2"
-  ), by = "id_visita") %>%
+  ), by = "id_visita") |>
+  rows_update(tibble(
+    id_visita = "0f3d9689-fb60-4291-b487-dbac3e9647e9",
+    insuf_resp = "1" # was 0 but NIV 24h
+  ), by = "id_visita") |>
+  rows_update(tibble(
+    id_visita = "f09adb88-0d08-11ea-bd04-ffdc264f1e4b",
+    insuf_resp = "1" # was 0 but NIV 24h
+  ), by = "id_visita") |>
+  rows_update(tibble(
+    id_visita = "e7760217-1be6-4c7f-b6a9-78f03e7680b1",
+    insuf_resp = "1" # was 0 but NIV 24h
+  ), by = "id_visita") |>
+  rows_update(tibble(
+    id_visita = "e7760217-1be6-4c7f-b6a9-78f03e7680b1",
+    insuf_resp = "2" # was 0 but NIV at night
+  ), by = "id_visita") |>
+  rows_update(tibble(
+    id_visita = "4b479b64-5efe-11eb-a21b-8316bff80df0",
+    insuf_resp = "1" # was 0 but NIV 24h
+  ), by = "id_visita") |>
+  rows_update(tibble(
+    id_visita = "b9774df2-a13f-11e8-ad7f-671f9464d224",
+    insuf_resp = "2" # was 0 but NIV at night
+  ), by = "id_visita") |>
+  rows_reset(tibble(
+    id_visita = "50c36c1e-72e0-458e-a04d-9be552afd3bb"
+  ), by = "id_visita") |> # one item was missing
   mutate(
     across(everything(), ufmn_parse_na),
     across(lenguaje:insuf_resp, parse_integer),
     fecha_visita = ufmn_parse_date(fecha_visita)
-  ) %>%
-  select(!c(total:total_bulbar, mitos, created_datetime:updated_datetime)) %>%
+  ) |>
+  select(!c(total:total_bulbar, mitos, created_datetime:updated_datetime)) |>
   arrange(id_paciente, fecha_visita)
 
 ufmn_followups <- bind_rows(
@@ -797,30 +813,30 @@ ufmn_followups <- bind_rows(
       breathing <- disnea <= 1 | insuf_resp <= 2
       walking_selfcare + swallowing + communication + breathing
     }
-  ) %>%
+  ) |>
   select(id_paciente, id_visita, fecha_visita, tipo_visita, cortar, kings_c, mitos)
 
-ufmn_functional %<>%
+ufmn_functional <- ufmn_functional |>
   left_join(
     ufmn_followups |>
       filter(tipo_visita == "functional") |>
       select(id_visita, cortar, kings_c, mitos),
     by = "id_visita", multiple = "all"
-  ) %>%
+  ) |>
   mutate(
     cortar_con_peg = if_else(cortar == cortar_con_peg, cortar_con_peg, NA_integer_),
     cortar_sin_peg = if_else(cortar == cortar_sin_peg, cortar_sin_peg, NA_integer_)
-  ) %>%
-  rowwise() %>%
+  ) |>
+  rowwise() |>
   mutate(
     alsfrs_bulbar = sum(c_across(lenguaje:deglucion)),
     alsfrs_motor_fino = sum(c_across(escritura:vestido), na.rm = TRUE),
     alsfrs_motor_grosero = sum(c_across(cama:subir_escaleras)),
     alsfrs_respiratorio = sum(c_across(disnea:insuf_resp)),
     alsfrs_total = sum(c_across(lenguaje:insuf_resp), na.rm = TRUE)
-  ) %>%
-  filter(!if_all(lenguaje:insuf_resp, is.na)) %>%
-  relocate(cortar, .before = cortar_sin_peg) %>%
+  ) |>
+  filter(!if_all(lenguaje:insuf_resp, is.na)) |>
+  relocate(cortar, .before = cortar_sin_peg) |>
   relocate(kings_r:mitos, .after = alsfrs_total)
 
 DBI::dbDisconnect(ufmn_db)

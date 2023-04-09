@@ -4,7 +4,7 @@ library(readxl)
 
 pram_data_path <- "data/pram-2022_12_09.xlsx"
 
-pram_cases <- read_excel(pram_data_path) %>%
+pram_cases <- read_excel(pram_data_path) |>
     select(
         expediente = "Número expedient",
         fecha = "Data expedient",
@@ -30,7 +30,7 @@ pram_cases <- read_excel(pram_data_path) %>%
         posicionamiento_pleno = "Posicionament Ple",
         codigo_dx = "Codi CIM-10",
         descripcion_dx = "Descripció CIM10"
-    ) %>%
+    ) |>
     mutate(
         cip = str_extract(datos_paciente, R"([A-Z]{4}\d{10})"),
         codificacion_dx = "ICD-10",
