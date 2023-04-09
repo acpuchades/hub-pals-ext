@@ -4,6 +4,7 @@ library(stringr)
 
 source("src/ufmn.r")
 source("src/fmv.r")
+source("src/vmi.r")
 source("src/pram.r")
 source("src/imegen.r")
 source("src/metrosud.r")
@@ -308,7 +309,7 @@ pals_genetics <- ufmn_clinical %>%
     across(ends_with("_status"), pals_recode_genetic_result),
   )
 
-pals_hosp <- sectecnica_hosp %>%
+pals_hospitalizations <- sectecnica_hosp %>%
   mutate(
     discharge_type = pals_recode_discharge_type(destino_al_alta),
   ) %>%
@@ -364,13 +365,6 @@ pals_nutrition <- ufmn_nutrition %>%
     laxative_usage = laxante,
   ) %>%
   semi_join(pals_patients, by = "patient_id")
-
-pals_imv_dates <- ufmn_functional |>
-  filter(disnea == 0) |>
-  group_by(id_paciente) |>
-  slice_min(fecha_visita, n = 1, with_ties = FALSE) |>
-  ungroup() |>
-  transmute(patient_id = id_paciente, imv_start_date_approx = fecha_visita)
 
 pals_respiratory <- ufmn_respiratory %>%
   select(
@@ -436,8 +430,13 @@ pals_respiratory <- ufmn_respiratory %>%
     niv_stopped_reason_voluntary = motivo_retirada_vmi_rechazo_del_paciente,
     niv_stopped_reason_other = motivo_retirada_vmi_otros
   ) |>
-  semi_join(pals_patients, by = "patient_id") %>%
-  left_join(pals_imv_dates, by = "patient_id")
+  semi_join(pals_patients, by = "patient_id")
+
+pals_imv <- vmi_data |>
+  rename(
+    patient_id = "id_paciente",
+    imv_start_date = "fecha_inicio_vmi"
+  )
 
 pals_genesets <- imegen_paneles %>%
   rename(
@@ -548,9 +547,10 @@ pals_export <- function(path) {
     "genesets" = pals_genesets,
     "genetics" = pals_genetics,
     "genetics_ext" = pals_genetics_ext,
-    "hospitalizations" = pals_hosp,
     "gpvisits" = pals_gpvisits,
     "gpvars" = pals_gpvars,
+    "hospitalizations" = pals_hospitalizations,
+    "imv" = pals_imv,
     "nutrition" = pals_nutrition,
     "patients" = pals_patients,
     "respiratory" = pals_respiratory,
