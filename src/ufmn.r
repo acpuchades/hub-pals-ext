@@ -5,7 +5,7 @@ library(stringi)
 library(readr)
 library(tidyr)
 
-source("src/utils.r")
+source("src/common.r")
 
 ufmn_data_path <- "data/ufmn-2023_01_18.sqlite"
 
