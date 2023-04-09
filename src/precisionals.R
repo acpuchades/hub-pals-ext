@@ -535,32 +535,3 @@ pals_gpvars <- ufmn_patients |>
     var_name, value = valor
   ) |>
   drop_na(patient_id, var_name)
-
-pals_export <- function(path) {
-  dir.create(path, recursive = TRUE, showWarnings = FALSE)
-
-  exports <- list(
-    "alsfrs_r" = pals_alsfrs,
-    "comorbidities" = pals_comorbidities,
-    "er_diagnoses" = pals_er_diagnoses,
-    "er_episodes" = pals_er_episodes,
-    "genesets" = pals_genesets,
-    "genetics" = pals_genetics,
-    "genetics_ext" = pals_genetics_ext,
-    "gpvisits" = pals_gpvisits,
-    "gpvars" = pals_gpvars,
-    "hospitalizations" = pals_hospitalizations,
-    "imv" = pals_imv,
-    "nutrition" = pals_nutrition,
-    "patients" = pals_patients,
-    "respiratory" = pals_respiratory,
-    "social" = pals_social,
-    "treatments" = pals_treatments
-  )
-
-  for (key in names(exports)) {
-    data <- exports[[key]]
-    output_path <- file.path(path, str_glue("pals-ext-{key}.csv"))
-    write_csv(data, output_path)
-  }
-}
