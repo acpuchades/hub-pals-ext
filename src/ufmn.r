@@ -5,8 +5,6 @@ library(stringi)
 library(readr)
 library(tidyr)
 
-source("src/common.r")
-
 ufmn_data_path <- "data/ufmn-2023_01_18.sqlite"
 
 ufmn_parse_na <- function(data, na_empty = FALSE) {
@@ -614,6 +612,13 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") |>
   select(!c(created_datetime:updated_datetime)) |>
   arrange(id_paciente, fecha_visita)
 
+ufmn_functional_na <- tibble(
+  lenguaje = NA, salivacion = NA, deglucion = NA,
+  escritura = NA, cortar_con_peg = NA, cortar_sin_peg = NA, vestido = NA,
+  cama = NA, caminar = NA, subir_escaleras = NA,
+  disnea = NA, ortopnea = NA, insuf_resp = NA
+)
+
 ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") |>
   rename(
     id_visita = id,
@@ -622,46 +627,46 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") |>
     insuf_resp = insuficiencia_respiratoria,
     kings_r = kings
   ) |>
-  rows_reset(tibble(id_visita = "c762bfca-df50-11e7-913f-898db1444b28"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "7824e0ae-0b1b-11e8-ada5-c11bb16fd5d7"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "d950b7be-be53-11e7-854b-69bf7a307972"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "52a010f0-0b53-11e8-a739-3927728b190b"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "c490d08e-22e4-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "b98eb8de-0b12-11e8-ada5-c11bb16fd5d7"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "31775b3a-df53-11e7-913f-898db1444b28"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "3290366e-0b17-11e8-ada5-c11bb16fd5d7"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "482ed0f2-22e6-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "1e1b0230-bfaf-11e7-8973-f909c4af69c9"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "7b222648-e4d0-11e7-8222-4fcf3b7eb7b9"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "d48b24a2-e0cd-11e7-a41d-951fbf0a64ef"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "6216659c-4431-11eb-8819-1948421e8c8d"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "081ccd70-3c08-11e9-bacb-89acb4d69104"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "1142f7a0-8f63-11e8-90a3-ff2b0bfabaa2"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "277837de-208a-11e9-9341-45e3ce47fe90"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "664c7d1e-ee90-11ea-aa63-851e06783497"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "9e46525a-b305-11eb-96a7-27cdb1c6efb1"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "f877112a-59b2-11ec-97be-b1dc88f020df"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "7d33fa84-edbe-11ea-b1c3-e5404a292065"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "0418da4a-df50-11e7-913f-898db1444b28"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "40573a56-22e4-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "a0a3bff2-e2cb-11ea-b03f-a7e8f227e03a"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "66532790-be5f-11e7-854b-69bf7a307972"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "6ce47da4-d99c-11e7-b681-6585f92f3d5c"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "5f4bc604-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "8025974c-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "89d6f9ac-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "c3c10f66-bfca-11e7-af09-51e9d3377771"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "f5997e1c-163a-11e8-a95d-b7c3df0bafe2"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "8356b516-3df3-11eb-9383-d3a3b2195eff"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "c0792408-2b4d-11e8-a24c-e9b93d7ec40a"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "2b5c8a1c-1d70-11e8-824e-4f42ed25e7a5"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "31acd35a-22e2-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "da5aa432-22e2-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "5e969c7e-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
-  rows_reset(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4"), by = "id_visita") |>
+  rows_update(tibble(id_visita = "c762bfca-df50-11e7-913f-898db1444b28", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "7824e0ae-0b1b-11e8-ada5-c11bb16fd5d7", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "d950b7be-be53-11e7-854b-69bf7a307972", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "52a010f0-0b53-11e8-a739-3927728b190b", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "c490d08e-22e4-11e8-bd92-937d2f7100b4", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "b98eb8de-0b12-11e8-ada5-c11bb16fd5d7", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "31775b3a-df53-11e7-913f-898db1444b28", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "3290366e-0b17-11e8-ada5-c11bb16fd5d7", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "482ed0f2-22e6-11e8-bd92-937d2f7100b4", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "1e1b0230-bfaf-11e7-8973-f909c4af69c9", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "7b222648-e4d0-11e7-8222-4fcf3b7eb7b9", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "d48b24a2-e0cd-11e7-a41d-951fbf0a64ef", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "6216659c-4431-11eb-8819-1948421e8c8d", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "081ccd70-3c08-11e9-bacb-89acb4d69104", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "1142f7a0-8f63-11e8-90a3-ff2b0bfabaa2", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "277837de-208a-11e9-9341-45e3ce47fe90", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "664c7d1e-ee90-11ea-aa63-851e06783497", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "9e46525a-b305-11eb-96a7-27cdb1c6efb1", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "f877112a-59b2-11ec-97be-b1dc88f020df", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "7d33fa84-edbe-11ea-b1c3-e5404a292065", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "0418da4a-df50-11e7-913f-898db1444b28", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "40573a56-22e4-11e8-bd92-937d2f7100b4", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "a0a3bff2-e2cb-11ea-b03f-a7e8f227e03a", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "66532790-be5f-11e7-854b-69bf7a307972", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "6ce47da4-d99c-11e7-b681-6585f92f3d5c", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "5f4bc604-163a-11e8-a95d-b7c3df0bafe2", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "8025974c-163a-11e8-a95d-b7c3df0bafe2", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "89d6f9ac-163a-11e8-a95d-b7c3df0bafe2", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "c3c10f66-bfca-11e7-af09-51e9d3377771", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "f5997e1c-163a-11e8-a95d-b7c3df0bafe2", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "e9663f4a-df4e-11e7-913f-898db1444b28", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "8356b516-3df3-11eb-9383-d3a3b2195eff", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "c0792408-2b4d-11e8-a24c-e9b93d7ec40a", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "2b5c8a1c-1d70-11e8-824e-4f42ed25e7a5", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "31acd35a-22e2-11e8-bd92-937d2f7100b4", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "da5aa432-22e2-11e8-bd92-937d2f7100b4", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "5e969c7e-22e3-11e8-bd92-937d2f7100b4", ufmn_functional_na), by = "id_visita") |>
+  rows_update(tibble(id_visita = "de1f1d4a-22e3-11e8-bd92-937d2f7100b4", ufmn_functional_na), by = "id_visita") |>
   rows_update(tibble(
     id_visita = "3318ad62-e4db-11e7-8222-4fcf3b7eb7b9",
     # ALSFRS 4-4-4-2-1-2-3-3-3-4-4-4
