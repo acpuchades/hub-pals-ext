@@ -1,4 +1,5 @@
 library(xfun)
+library(writexl)
 
 source("src/precisionals.r")
 source("src/qc/alsfrs-increases.r")
@@ -48,9 +49,9 @@ dir.create(qc_output_dir, recursive = TRUE, showWarnings = FALSE)
 
 for (key in names(qc_exports)) {
     data <- qc_exports[[key]]
-    output_name <- key |> with_ext(".csv")
+    output_name <- key |> with_ext(".xlsx")
     path <- file.path(qc_output_dir, output_name)
     if (nrow(data) > 0) {
-        write_csv(data, path)
+        write_xlsx(data, path)
     }
 }
