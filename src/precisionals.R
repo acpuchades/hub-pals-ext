@@ -184,6 +184,16 @@ pals_last_followups <- ufmn_patients |>
   rename(last_followup = "fecha_visita") |>
   select(patient_id = id_paciente, last_followup)
 
+pals_euthanasia <- ufmn_patients |>
+  left_join(pram_cases, by = "cip") |>
+  transmute(
+    patient_id = id_paciente,
+    death_cause = if_else(
+      estado == "Expedient finalitzat",
+      "euthanasia", NA_character_
+    )
+  )
+
 pals_patients <- ufmn_patients |>
   inner_join(ufmn_clinical, by = "id_paciente") |>
   select(!c(
@@ -236,14 +246,10 @@ pals_patients <- ufmn_patients |>
     mn_involvement = pals_recode_mn_involvement(afectacion_motoneurona_inicial),
     mn_predominance = pals_recode_mn_involvement(predominio_motoneurona_inicial),
     weakness_pattern = pals_recode_weakness_pattern(patron_debilidad_inicial),
-    death_cause = ufmn_patients |>
-      left_join(pram_cases, by = "cip") %$%
-      case_when(
-        estado == "Expedient finalitzat" ~ "euthanasia"
-      ),
     .keep = "unused",
   ) |>
   left_join(pals_last_followups, by = "patient_id") |>
+  left_join(pals_euthanasia, by = "patient_id") |>
   relocate(site, .before = everything()) |>
   relocate(death_cause, .after = death_date)
 
