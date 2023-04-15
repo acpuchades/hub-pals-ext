@@ -765,8 +765,9 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") |>
     id_visita = "b9774df2-a13f-11e8-ad7f-671f9464d224",
     insuf_resp = "2" # was 0 but NIV at night
   ), by = "id_visita") |>
-  rows_reset(tibble(
-    id_visita = "50c36c1e-72e0-458e-a04d-9be552afd3bb"
+  rows_update(tibble(
+    id_visita = "50c36c1e-72e0-458e-a04d-9be552afd3bb",
+    ufmn_functional_na
   ), by = "id_visita") |> # one item was missing
   mutate(
     across(everything(), ufmn_parse_na),
