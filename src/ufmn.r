@@ -771,6 +771,42 @@ ufmn_functional <- DBI::dbReadTable(ufmn_db, "esc_val_ela") |>
     id_visita = "50c36c1e-72e0-458e-a04d-9be552afd3bb",
     ufmn_functional_na
   ), by = "id_visita") |> # one item was missing
+  rows_update(tibble(id_visita = "df6e4be8-ece2-11e8-9848-4918586d805c", insuf_resp = "1"), by = "id_visita") |> # input error
+  rows_update(tibble(id_visita = "4c2117bf-7e35-436c-9474-5810f1a56d11", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV 24h
+  rows_update(tibble(id_visita = "5687a720-144a-11eb-a89a-6b209013f10b", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV night+evening
+  rows_update(tibble(id_visita = "5f6a1bb4-35be-11e9-9d5b-8bbcbda4b703", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV continuous
+  rows_update(tibble(id_visita = "c1fa58c4-4a2d-11e9-aa67-911a321675fd", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV continuous
+  rows_update(tibble(id_visita = "734bdaac-8855-11e9-a996-85cf5f8a7da8", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night
+  rows_update(tibble(
+    id_visita = "c4c00730-5229-11e9-9c8d-49127adcad79",
+    subir_escaleras = "0", disnea = "4", ortopnea = "3", insuf_resp = "2"
+  ), by = "id_visita") |> # input error
+  rows_update(tibble(id_visita = "c39cd9ec-12a3-11ea-badc-8b5db01dc70c", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV night+day
+  rows_update(tibble(id_visita = "5ac82eae-5720-11eb-b851-a98716dedb3b", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV night+day
+  rows_update(tibble(id_visita = "341e691e-5b06-11eb-93ec-47a37bd971de", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night
+  rows_update(tibble(id_visita = "1987d942-d096-11e9-961d-d3f87ec1e7e1", insuf_resp = "2"), by = "id_visita") |> # input error
+  rows_update(tibble(id_visita = "d65d4824-35c1-11e9-9d5b-8bbcbda4b703", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night+napping
+  rows_update(tibble(id_visita = "ec71f4dc-dc59-11e8-bc06-07fced284dd5", insuf_resp = "4"), by = "id_visita") |> # insuf_resp was missing
+  rows_update(tibble(id_visita = "cd43db56-4a37-11e9-bae2-db6cecf46582", insuf_resp = "4"), by = "id_visita") |> # insuf_resp was missing
+  rows_update(tibble(id_visita = "c75b359e-d143-11e8-8f4a-4bcfafe3ea16", insuf_resp = "2"), by = "id_visita") |> # insuf_resp was missing
+  rows_update(tibble(id_visita = "3269d82a-db9a-11e9-b372-090a91bd3693", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV night+day
+  rows_update(tibble(
+    id_visita = "85ea555a-e847-11ea-977e-b122c786f9d6",
+    cortar_con_peg = "1", cortar_sin_peg = "1",
+    insuf_resp = "1"
+  ), by = "id_visita") |> # input error
+  rows_update(tibble(id_visita = "6f1f8b6a-94a7-11e8-a3fb-23e7f9dfb86b", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night
+  rows_update(tibble(id_visita = "c7c00818-3b40-11e9-b6ec-151f525efe3b", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night
+  rows_update(tibble(id_visita = "8e916e3c-8853-11e9-a996-85cf5f8a7da8", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night
+  rows_update(tibble(id_visita = "441f881c-47b2-11e8-915c-1db1c3288c02", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night
+  rows_update(tibble(id_visita = "5aa6d428-47b2-11e8-915c-1db1c3288c02", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night
+  rows_update(tibble(id_visita = "4f683fc8-8f30-11e8-868f-5b216cc17e72", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night+napping
+  rows_update(tibble(id_visita = "4f683fc8-8f30-11e8-868f-5b216cc17e72", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night+napping
+  rows_update(tibble(id_visita = "1260ad94-fd40-11e8-b8f8-f9f84020282c", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV night+lying
+  rows_update(tibble(id_visita = "a70c1aa4-98be-11e9-9feb-8dcf40d9fa45", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV night+evening
+  rows_update(tibble(id_visita = "c2a91b80-e6c0-11ea-bb4e-0f169893a544", insuf_resp = "1"), by = "id_visita") |> # was 0 but NIV night+evening
+  rows_update(tibble(id_visita = "3ae8b926-4bd0-11e9-9035-1d0ef5bb5ce0", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night
+  rows_update(tibble(id_visita = "cf0b282e-fe09-11e8-8d88-95f7f8485e9f", insuf_resp = "2"), by = "id_visita") |> # was 0 but NIV night
   mutate(
     across(everything(), ufmn_parse_na),
     across(lenguaje:insuf_resp, parse_integer),
