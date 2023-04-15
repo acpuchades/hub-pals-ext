@@ -582,6 +582,8 @@ ufmn_respiratory <- DBI::dbReadTable(ufmn_db, "fun_res") |>
     id_visita = "d27161ca-b16e-11eb-9be1-99c56818900c",
     fvc_sentado = "155", fvc_sentado_absoluto = "4160"
   ), by = "id_visita") |> # values were flipped
+  rows_update(tibble(id_visita = "5acbae18-e612-11eb-a8da-cb9b998413f1", fecha_visita = "13-07-2021"), by = "id_visita") |> # was 13-07-2019
+  rows_update(tibble(id_visita = "2c24ac7e-544b-11e8-b5ee-37c4bbc2f8c2", fecha_visita = "11-05-2018"), by = "id_visita") |> # was 11-05-2015
   mutate(
     across(!c(ends_with("_cual"), cumplimiento_cpap), \(x) ufmn_parse_na(x, na_empty = TRUE)),
     across(starts_with("fecha"), ufmn_parse_date),
