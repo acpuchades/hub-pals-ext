@@ -869,15 +869,12 @@ ufmn_functional <- ufmn_functional |>
   ) |>
   mutate(
     cortar_con_peg = if_else(cortar == cortar_con_peg, cortar_con_peg, NA_integer_),
-    cortar_sin_peg = if_else(cortar == cortar_sin_peg, cortar_sin_peg, NA_integer_)
-  ) |>
-  rowwise() |>
-  mutate(
-    alsfrs_bulbar = sum(c_across(lenguaje:deglucion)),
-    alsfrs_motor_fino = sum(c_across(escritura:vestido), na.rm = TRUE),
-    alsfrs_motor_grosero = sum(c_across(cama:subir_escaleras)),
-    alsfrs_respiratorio = sum(c_across(disnea:insuf_resp)),
-    alsfrs_total = sum(c_across(lenguaje:insuf_resp), na.rm = TRUE)
+    cortar_sin_peg = if_else(cortar == cortar_sin_peg, cortar_sin_peg, NA_integer_),
+    alsfrs_bulbar = lenguaje + salivacion + deglucion,
+    alsfrs_motor_fino = escritura + cortar + vestido,
+    alsfrs_motor_grosero = cama + caminar + subir_escaleras,
+    alsfrs_respiratorio = disnea + ortopnea + insuf_resp,
+    alsfrs_total = alsfrs_bulbar + alsfrs_motor_fino + alsfrs_motor_grosero + alsfrs_respiratorio
   ) |>
   filter(!if_all(lenguaje:insuf_resp, is.na)) |>
   relocate(cortar, .before = cortar_sin_peg) |>
